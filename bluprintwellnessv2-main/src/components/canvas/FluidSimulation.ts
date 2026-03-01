@@ -382,6 +382,37 @@ export class FluidSimulation {
     });
   }
 
+  /**
+   * Queue scroll-driven splats — wide horizontal bands that react to scroll velocity.
+   * Creates ambient turbulence across the whole canvas when scrolling fast.
+   */
+  splatScroll(velocity: number) {
+    const absVel = Math.abs(velocity);
+    if (absVel < 1.5) return; // threshold — ignore slow scroll
+
+    // Non-linear intensity: fast scroll = much more turbulence
+    const strength = Math.pow(Math.min(absVel, 40), 0.7) * 0.4;
+    const dir = velocity > 0 ? -1 : 1; // flip: scroll down = fluid pushes up
+
+    // Emit 2-4 wide splats at random vertical positions
+    const count = Math.min(4, Math.floor(absVel / 5) + 2);
+    for (let i = 0; i < count; i++) {
+      const y = Math.random(); // random vertical position
+      const x = 0.3 + Math.random() * 0.4; // centered horizontally
+      this.splatQueue.push({
+        x,
+        y,
+        dx: (Math.random() - 0.5) * strength * 0.3, // slight horizontal spread
+        dy: dir * strength,
+        color: [
+          0.08 + Math.random() * 0.08,
+          0.06 + Math.random() * 0.06,
+          0.04 + Math.random() * 0.04,
+        ], // warm dark tone
+      });
+    }
+  }
+
   /** The density texture to sample in the output composite shader. */
   get texture(): Texture {
     return this.density.read.texture;

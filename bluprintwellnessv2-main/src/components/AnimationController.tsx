@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { animate, stagger, remove } from "animejs";
+import { scrambleReveal, scrambleText } from "@/lib/text-scramble";
+import { initMagnetic, destroyAllMagnetic } from "@/lib/magnetic";
 
 // Smart scroll-to function with scrollingMask for long distances
 function scrollToTarget(target: HTMLElement, lenis: any) {
@@ -56,27 +58,25 @@ export default function AnimationController() {
 
       let delay = 0;
 
-      // Label reveal
+      // Label reveal — scramble text effect
       if (label) {
-        animate(label, {
-          translateY: [40, 0],
-          opacity: [0, 1],
-          easing: "easeOutExpo",
-          duration: 600,
-          delay: 400,
-        });
+        scrambleReveal(label as HTMLElement, 200);
         delay = 400;
       }
 
-      // Title words reveal with rotate
+      // Title words reveal with 3D perspective rotation
       if (titleWords.length) {
+        // Set perspective on parent for 3D effect
+        const titleEl = target.querySelector(".st1");
+        if (titleEl) (titleEl as HTMLElement).style.perspective = "600px";
         animate(titleWords, {
-          translateY: ["100%", "0%"],
-          rotate: [10, 0],
+          translateY: ["110%", "0%"],
+          rotateX: [45, 0],
+          rotate: [8, 0],
           opacity: [0, 1],
-          duration: 800,
+          duration: 1000,
           easing: "easeOutExpo",
-          delay: stagger(60, { start: delay > 0 ? 100 : 0 }),
+          delay: stagger(50, { start: delay > 0 ? 100 : 0 }),
         });
       }
 
@@ -257,16 +257,19 @@ export default function AnimationController() {
     const handleSphereTitle = (e: Event) => {
       const { target, way } = (e as CustomEvent).detail;
       if (way !== "enter") return;
+      // Set perspective for 3D word rotation
+      (target as HTMLElement).style.perspective = "500px";
       const lines = [...target.querySelectorAll(".line")];
       lines.forEach((line, i) => {
         const words = [...(line as Element).querySelectorAll(".word")];
         if (words.length) {
           animate(words, {
             translateY: ["100%", "0"],
+            rotateX: [30, 0],
             opacity: [0, 1],
-            duration: 600,
+            duration: 800,
             easing: "easeOutExpo",
-            delay: stagger(0, { start: i * 120 }),
+            delay: stagger(40, { start: i * 120 }),
           });
         }
       });
@@ -540,9 +543,11 @@ export default function AnimationController() {
       });
     });
 
-    // ====== BUTTON HOVER (all .button:not(.button--empty)) ======
+    // ====== BUTTON HOVER — scramble + slide ======
     document.querySelectorAll(".button:not(.button--empty)").forEach((btn) => {
       btn.addEventListener("mouseenter", () => {
+        const label = btn.querySelector(".button_label") as HTMLElement;
+        if (label) scrambleText(label, { duration: 400, staggerPerChar: 20 });
         const chars = [...btn.querySelectorAll(".char")];
         if (chars.length) {
           animate(chars, {
@@ -613,6 +618,59 @@ export default function AnimationController() {
       });
     }
 
+    // ====== MAGNETIC INTERACTIONS ======
+    const magneticCleanups: (() => void)[] = [];
+
+    // Wait for DOM to be ready (after SplitType runs)
+    const magneticTimer = setTimeout(() => {
+      // Magnetic buttons
+      document.querySelectorAll(".button:not(.button--empty)").forEach((btn) => {
+        magneticCleanups.push(
+          initMagnetic(btn as HTMLElement, {
+            strength: 0.25,
+            innerStrength: 0.4,
+            innerSelector: ".button_label",
+          })
+        );
+      });
+
+      // Magnetic discover buttons (circular — stronger pull)
+      document.querySelectorAll(".buttonDiscover").forEach((btn) => {
+        magneticCleanups.push(
+          initMagnetic(btn as HTMLElement, {
+            strength: 0.35,
+            innerStrength: 0.5,
+            innerSelector: ".buttonDiscover_label",
+            threshold: 120,
+          })
+        );
+      });
+
+      // Magnetic nav links (subtle)
+      document.querySelectorAll(".navbar_nav_link").forEach((link) => {
+        magneticCleanups.push(
+          initMagnetic(link as HTMLElement, {
+            strength: 0.15,
+            innerStrength: 0,
+            threshold: 60,
+          })
+        );
+      });
+
+      // Magnetic hero scroll button
+      const heroScroll = document.querySelector(".hero_scroll");
+      if (heroScroll) {
+        magneticCleanups.push(
+          initMagnetic(heroScroll as HTMLElement, {
+            strength: 0.3,
+            innerStrength: 0.5,
+            innerSelector: ".hero_scroll_label",
+            threshold: 100,
+          })
+        );
+      }
+    }, 600);
+
     // Register all event listeners
     window.addEventListener("sectionHeader", handleSectionHeader);
     window.addEventListener("parentFade", handleParentFade);
@@ -626,6 +684,9 @@ export default function AnimationController() {
     window.addEventListener("collapseProgress", handleCollapseProgress);
 
     return () => {
+      clearTimeout(magneticTimer);
+      magneticCleanups.forEach(fn => fn());
+      destroyAllMagnetic();
       window.removeEventListener("sectionHeader", handleSectionHeader);
       window.removeEventListener("parentFade", handleParentFade);
       window.removeEventListener("heroBlur", handleHeroBlur);

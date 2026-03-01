@@ -98,6 +98,11 @@ export default function WebGLCanvas() {
         uZoomFrom: { value: 1.0 },
         uRotationFrom: { value: 0.0 },
         uImageMix: { value: 0 },
+        // Post-processing
+        uTime: { value: 0 },
+        uGrainIntensity: { value: 0.045 },
+        uChromaStrength: { value: 0.006 },
+        uVignetteStrength: { value: 0.2 },
       },
       depthTest: false,
       depthWrite: false,
@@ -108,6 +113,8 @@ export default function WebGLCanvas() {
     /* ------------------------------------------------------------ */
     /*  Animation loop                                               */
     /* ------------------------------------------------------------ */
+    const startTime = performance.now();
+
     const animate = () => {
       // Run fluid simulation step
       fluid.update();
@@ -131,6 +138,7 @@ export default function WebGLCanvas() {
       u.uZoomFrom.value = images.zoomFrom;
       u.uRotationFrom.value = images.rotationFrom;
       u.uImageMix.value = images.imageMix;
+      u.uTime.value = (performance.now() - startTime) * 0.001; // seconds
 
       // Render to screen
       renderer.render({ scene: outputMesh });
@@ -252,6 +260,24 @@ export default function WebGLCanvas() {
     window.addEventListener("webgl:unlockCarousel", handleUnlock);
 
     /* ------------------------------------------------------------ */
+    /*  Scroll-reactive fluid (scroll velocity → ambient turbulence) */
+    /* ------------------------------------------------------------ */
+    let lastScrollY = 0;
+    let lastScrollTime = 0;
+    const handleScrollFluid = () => {
+      const now = performance.now();
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      const dt = now - lastScrollTime;
+      if (dt > 0 && lastScrollTime > 0) {
+        const velocity = (scrollY - lastScrollY) / Math.max(dt, 8) * 16; // normalize to ~60fps
+        fluid.splatScroll(velocity);
+      }
+      lastScrollY = scrollY;
+      lastScrollTime = now;
+    };
+    window.addEventListener("scroll", handleScrollFluid, { passive: true });
+
+    /* ------------------------------------------------------------ */
     /*  Mobile mode switching on resize                              */
     /* ------------------------------------------------------------ */
     const handleMobileCheck = () => {
@@ -267,6 +293,7 @@ export default function WebGLCanvas() {
       cancelAnimationFrame(rafRef.current);
       resizeObserver.disconnect();
       window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("scroll", handleScrollFluid);
       window.removeEventListener("resize", handleMobileCheck);
       window.removeEventListener("sectionTransition", handleSectionTransition);
       window.removeEventListener("webgl:changeSlide", handleSlideChange);

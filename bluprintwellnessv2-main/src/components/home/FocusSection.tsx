@@ -27,6 +27,7 @@ export default function FocusSection() {
                 data-scroll
                 data-scroll-call="sphereTitle"
                 data-scroll-offset="15%"
+                data-scroll-speed="-0.4"
               >
                 {focusContent.sideTitle}
               </div>

@@ -18,9 +18,9 @@ export default function InvestSection() {
         discoverTarget="contact"
       />
 
-      <div className="invest_testimonials">
+      <div className="invest_testimonials ls-stagger">
         {investContent.testimonials.map((t, i) => (
-          <div key={i} className="invest_testimonial">
+          <div key={i} className="invest_testimonial ls-appear" data-scroll data-scroll-offset="20%">
             <div className="invest_testimonial_quote">&ldquo;{t.quote}&rdquo;</div>
             <div className="invest_testimonial_author">— {t.author}</div>
           </div>

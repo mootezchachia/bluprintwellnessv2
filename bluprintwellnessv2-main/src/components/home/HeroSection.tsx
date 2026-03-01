@@ -54,7 +54,7 @@ export default function HeroSection() {
                     ))}
                   </h1>
                 </div>
-                <div className="pSection_header_additional">
+                <div className="pSection_header_additional" data-scroll data-scroll-speed="-0.5">
                   <div className="st3" data-split>{heroContent.subtitle}</div>
                 </div>
               </div>
