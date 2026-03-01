@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+out/
+
+# Debug/test artifacts
+*.png
+*.log
+*.mjs
+dev-server*.log
+architecture.html
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+
+# Turbopack
+tsconfig.tsbuildinfo
+next-env.d.ts
+
+# Old download copy
+Downloads/

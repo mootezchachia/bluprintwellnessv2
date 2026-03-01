@@ -134,19 +134,6 @@ export default function AnimationController() {
       }
     };
 
-    // ====== SECTION TRANSITION (WebGL morph) ======
-    const handleSectionTransition = (e: Event) => {
-      const { target, progress } = (e as CustomEvent).detail;
-      const from = target.getAttribute("data-from");
-      const to = target.getAttribute("data-to");
-      if (target.classList.contains("is-inview") && progress > 0 && progress < 1) {
-        // Dispatch to WebGL canvas
-        window.dispatchEvent(new CustomEvent("webgl:transition", {
-          detail: { progress, from, to }
-        }));
-      }
-    };
-
     // ====== HERO BLUR ======
     const handleHeroBlur = (e: Event) => {
       const { progress } = (e as CustomEvent).detail;
@@ -328,7 +315,7 @@ export default function AnimationController() {
     };
 
     // ====== RECOGNITION CAROUSEL (scroll-driven) ======
-    const recognitionState = { currentSlide: 0 };
+    const recognitionState = { currentSlide: 0, initialized: false, unlocked: false };
     const handleRecognition = (e: Event) => {
       const { progress } = (e as CustomEvent).detail;
       const container = document.querySelector(".recognition");
@@ -341,11 +328,35 @@ export default function AnimationController() {
       const totalSlides = titles.length;
       if (totalSlides === 0) return;
 
-      // Remap raw progress so all 3 slides fit within the sticky visible phase.
-      // The LS progress range exceeds the sticky viewport; compressing by ~2.2x
-      // ensures transitions happen while the section is pinned on screen.
-      const p = Math.min(progress * 1.8, 1);
-      const newSlide = Math.min(Math.floor(p * totalSlides), totalSlides - 1);
+      // State machine: initialize on entry, lock during section, unlock at exit
+      if (!recognitionState.initialized && progress > 0 && progress < 0.95) {
+        recognitionState.initialized = true;
+        recognitionState.unlocked = false;
+        window.dispatchEvent(new CustomEvent("webgl:changeSlide", {
+          detail: { index: 0, step: "brands" }
+        }));
+        window.dispatchEvent(new CustomEvent("webgl:lockCarousel"));
+      }
+
+      // Unlock once at end of section (no re-lock/unlock thrashing)
+      if (progress >= 0.95 && !recognitionState.unlocked) {
+        recognitionState.unlocked = true;
+        window.dispatchEvent(new CustomEvent("webgl:unlockCarousel"));
+      }
+
+      // Re-lock if user scrolls back into section from the end
+      if (progress < 0.90 && recognitionState.unlocked) {
+        recognitionState.unlocked = false;
+        window.dispatchEvent(new CustomEvent("webgl:lockCarousel"));
+      }
+
+      // Reset when section fully exits (for next scroll-through)
+      if (progress <= 0 || progress >= 1) {
+        recognitionState.initialized = false;
+        recognitionState.unlocked = false;
+      }
+
+      const newSlide = Math.min(Math.floor(progress * totalSlides), totalSlides - 1);
 
       // Update progress bars — active fills proportionally, past = full, future = empty
       navItems.forEach((item, i) => {
@@ -354,7 +365,7 @@ export default function AnimationController() {
         if (i === newSlide) {
           const sliceSize = 1 / totalSlides;
           const sliceStart = newSlide * sliceSize;
-          const sliceProgress = Math.max(0, Math.min(1, (p - sliceStart) / sliceSize));
+          const sliceProgress = Math.max(0, Math.min(1, (progress - sliceStart) / sliceSize));
           bar.style.transform = `scaleX(${sliceProgress})`;
         } else if (i < newSlide) {
           bar.style.transform = "scaleX(1)";
@@ -416,14 +427,15 @@ export default function AnimationController() {
           }
         }
 
-        // Trigger WebGL texture change
+        // Trigger WebGL texture change (include step to prevent race with activateSection)
         window.dispatchEvent(new CustomEvent("webgl:changeSlide", {
-          detail: { index: newSlide }
+          detail: { index: newSlide, step: "brands" }
         }));
       }
     };
 
     // ====== MANIFESTO TEXT REVEAL ======
+    let readTextCurrentStep = 0;
     const handleReadText = (e: Event) => {
       const { target, progress } = (e as CustomEvent).detail;
       const words = target.querySelectorAll(".word");
@@ -433,7 +445,6 @@ export default function AnimationController() {
       const activeIndex = Math.round((words.length + 5) * progress);
 
       // Track step changes for WebGL transitions
-      let currentStep = 0;
       const stepMap: number[] = [];
       let stepIdx = 0;
       words.forEach((_: Element, i: number) => {
@@ -443,10 +454,10 @@ export default function AnimationController() {
 
       if (activeIndex > 0 && activeIndex < words.length) {
         const newStep = stepMap[activeIndex];
-        if (newStep !== currentStep) {
-          currentStep = newStep;
+        if (newStep !== readTextCurrentStep) {
+          readTextCurrentStep = newStep;
           window.dispatchEvent(new CustomEvent("webgl:changeSlide", {
-            detail: { index: newStep }
+            detail: { index: newStep, step: "manifesto" }
           }));
         }
       }
@@ -493,9 +504,9 @@ export default function AnimationController() {
             newItem.classList.add("active");
             animateCollapseOpen(newItem as HTMLElement);
           }
-          // WebGL texture change
+          // WebGL texture change (collapseName = step key: "experimentation" or "focus")
           window.dispatchEvent(new CustomEvent("webgl:changeSlide", {
-            detail: { index: newIndex }
+            detail: { index: newIndex, step: collapseName }
           }));
         }
       }
@@ -605,7 +616,6 @@ export default function AnimationController() {
     // Register all event listeners
     window.addEventListener("sectionHeader", handleSectionHeader);
     window.addEventListener("parentFade", handleParentFade);
-    window.addEventListener("sectionTransition", handleSectionTransition);
     window.addEventListener("heroBlur", handleHeroBlur);
     window.addEventListener("triggerStep", handleTriggerStep);
     window.addEventListener("sphereTitle", handleSphereTitle);
@@ -618,7 +628,6 @@ export default function AnimationController() {
     return () => {
       window.removeEventListener("sectionHeader", handleSectionHeader);
       window.removeEventListener("parentFade", handleParentFade);
-      window.removeEventListener("sectionTransition", handleSectionTransition);
       window.removeEventListener("heroBlur", handleHeroBlur);
       window.removeEventListener("triggerStep", handleTriggerStep);
       window.removeEventListener("sphereTitle", handleSphereTitle);

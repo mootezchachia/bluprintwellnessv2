@@ -148,6 +148,8 @@ export class ImageTransition {
   private currentSlideIndex = 0;
   private fadeAnimationId: number | null = null;
   private fallbackTexture: Texture;
+  private _carouselLock = false; // true while a carousel controls images
+  private _lastSlidePerStep: Map<string, number> = new Map(); // tracks last slide index per step
 
   constructor(gl: OGLRenderingContext) {
     this.gl = gl;
@@ -261,10 +263,25 @@ export class ImageTransition {
    * Progress goes 0 -> 1 during the scroll between sections.
    */
   onProgress(progress: number, fromKey: string, toKey: string) {
+    if (this._carouselLock) return;
+
+    // If a slide fade is in progress, complete it immediately to allow the morph
+    if (this.fadeAnimationId !== null) {
+      cancelAnimationFrame(this.fadeAnimationId);
+      this.fadeAnimationId = null;
+      this.textureA = this.textureB;
+      this.imageResA = [...this.imageResB] as [number, number];
+      this.fadeProgress = 0;
+      this.mode = 0;
+      this.progress = 0;
+    }
+
     this.mode = 0;
 
-    // Get the first image from each step
-    const fromUrl = this.getImageUrl(fromKey, 0);
+    // Use last known slide index for the "from" step
+    // (preserves accordion/carousel position, e.g. focus-4 instead of focus-1)
+    const fromSlideIdx = this._lastSlidePerStep.get(fromKey) ?? 0;
+    const fromUrl = this.getImageUrl(fromKey, fromSlideIdx);
     const toUrl = this.getImageUrl(toKey, 0);
 
     if (fromUrl) {
@@ -300,7 +317,11 @@ export class ImageTransition {
     duration = 0.8,
     zoomFrom = 1.05,
     rotationFrom = 0.02,
+    trusted = false,
   ) {
+    // Block non-trusted slide changes while carousel is locked
+    if (this._carouselLock && !trusted) return;
+
     // Cancel any running fade animation
     if (this.fadeAnimationId !== null) {
       cancelAnimationFrame(this.fadeAnimationId);
@@ -318,6 +339,9 @@ export class ImageTransition {
     const toIndex = index;
 
     if (fromIndex === toIndex) return;
+
+    // Track target slide immediately so sectionTransition morphs use the right "from" image
+    this._lastSlidePerStep.set(this.currentStepKey, toIndex);
 
     // Set A = current slide, B = target slide
     const fromUrl = urls[fromIndex];
@@ -376,10 +400,23 @@ export class ImageTransition {
    */
   setStep(key: string) {
     if (this.currentStepKey === key) return;
+    // Block step changes while carousel is locked (e.g. sphere activation during recognition)
+    if (this._carouselLock) return;
+
+    // Save current step's slide position before changing
+    if (this.currentStepKey) {
+      this._lastSlidePerStep.set(this.currentStepKey, this.currentSlideIndex);
+    }
+
     this.currentStepKey = key;
     this.currentSlideIndex = 0;
 
-    // Load first image of the new step as the "A" texture
+    // Only load textures on cold start (no visible image yet).
+    // During scroll transitions, sectionTransition morphs handle the visual change
+    // — loading here would snap the image and break the smooth morph.
+    if (this.textureA !== this.fallbackTexture) return;
+
+    // Cold start: load first image of the new step as the "A" texture
     const url = this.getImageUrl(key, 0);
     if (url) {
       const tex = this.getTextureForUrl(url);
@@ -398,6 +435,20 @@ export class ImageTransition {
         });
       }
     }
+  }
+
+  /**
+   * Lock sectionTransition morphs (carousel is controlling images).
+   */
+  lockCarousel() {
+    this._carouselLock = true;
+  }
+
+  /**
+   * Unlock sectionTransition morphs.
+   */
+  unlockCarousel() {
+    this._carouselLock = false;
   }
 
   /**

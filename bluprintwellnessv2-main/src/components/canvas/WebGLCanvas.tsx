@@ -3,7 +3,7 @@
 import { useRef, useEffect } from "react";
 import { Renderer, Program, Mesh, Triangle, Texture } from "ogl";
 import { FluidSimulation } from "./FluidSimulation";
-import { ImageTransition, STEPS } from "./ImageTransition";
+import { ImageTransition, STEPS, STEP_ORDER } from "./ImageTransition";
 import { baseVert, outputFrag } from "./shaders";
 
 export default function WebGLCanvas() {
@@ -194,28 +194,28 @@ export default function WebGLCanvas() {
     /* ------------------------------------------------------------ */
 
     // Direct LS v5 sectionTransition progress events
+    // Guard: ignore stale transitions if we've already moved past them
     const handleSectionTransition = (e: Event) => {
       const { target, progress } = (e as CustomEvent).detail;
       const from = target.getAttribute("data-from");
       const to = target.getAttribute("data-to");
-      if (to && STEPS[to] && progress > 0 && progress < 1) {
-        images.onProgress(progress, from || "hero", to);
-      }
-    };
+      if (!to || !STEPS[to] || progress <= 0 || progress >= 1) return;
 
-    // AnimationController dispatches webgl:transition (redundant safety)
-    const handleWebGLTransition = (e: Event) => {
-      const { progress, from, to } = (e as CustomEvent).detail;
-      if (to && STEPS[to]) {
-        images.onProgress(progress, from || "hero", to);
-      }
+      // Skip if current step is already beyond this transition in the chain
+      const currentIdx = STEP_ORDER.indexOf(images.stepKey);
+      const toIdx = STEP_ORDER.indexOf(to);
+      if (currentIdx > toIdx) return;
+
+      images.onProgress(progress, from || "hero", to);
     };
 
     // Slide change events from AnimationController (recognition, manifesto, accordions)
     const handleSlideChange = (e: Event) => {
       const { index, step } = (e as CustomEvent).detail;
       if (step) images.setStep(step);
-      images.changeSlide(index ?? 0);
+      // Recognition carousel events (step="brands") are trusted and bypass carousel lock
+      const trusted = step === "brands";
+      images.changeSlide(index ?? 0, 0.8, 1.05, 0.02, trusted);
     };
 
     // Section activation → set current step for image system
@@ -241,10 +241,15 @@ export default function WebGLCanvas() {
       }
     };
 
+    // Carousel lock/unlock events from AnimationController
+    const handleLock = () => images.lockCarousel();
+    const handleUnlock = () => images.unlockCarousel();
+
     window.addEventListener("sectionTransition", handleSectionTransition);
-    window.addEventListener("webgl:transition", handleWebGLTransition);
     window.addEventListener("webgl:changeSlide", handleSlideChange);
     window.addEventListener("activateSection", handleActivateSection);
+    window.addEventListener("webgl:lockCarousel", handleLock);
+    window.addEventListener("webgl:unlockCarousel", handleUnlock);
 
     /* ------------------------------------------------------------ */
     /*  Mobile mode switching on resize                              */
@@ -264,9 +269,10 @@ export default function WebGLCanvas() {
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("resize", handleMobileCheck);
       window.removeEventListener("sectionTransition", handleSectionTransition);
-      window.removeEventListener("webgl:transition", handleWebGLTransition);
       window.removeEventListener("webgl:changeSlide", handleSlideChange);
       window.removeEventListener("activateSection", handleActivateSection);
+      window.removeEventListener("webgl:lockCarousel", handleLock);
+      window.removeEventListener("webgl:unlockCarousel", handleUnlock);
       gl.canvas.remove();
     };
   }, []);
