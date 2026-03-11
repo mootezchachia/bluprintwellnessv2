@@ -80,12 +80,14 @@ export const experimentationContent = {
       title: "Functional \n Medicine",
       body: "Personalized, root-cause analysis and interventions to optimize metabolic health, hormones, and cellular function. NAD+ IV therapy fuels your cells with the coenzyme they need to repair DNA, restore energy, and slow cellular aging. Led by Dr. Lain Lye, ND, combining the science of modern functional medicine with the art of natural healing — including advanced lab testing, targeted nutraceuticals, and regenerative therapies.",
       image: "/images/desktop/detail-3.webp",
+      link: { label: "Learn More", href: "/functional-medicine" },
     },
     {
       num: ".04",
       title: "Precision \n Aesthetics",
       body: "Evidence-based treatments that harmonize appearance with overall wellbeing. Featuring Morpheus8 RF Microneedling for deep skin remodeling, Botox® and Dermal Fillers with 20+ years of medical expertise, and Candela GentleMax Pro Plus dual-wavelength laser technology — the gold standard in aesthetic treatments, delivered by Suzanne Dean, RN.",
       image: "/images/desktop/detail-4.webp",
+      link: { label: "Learn More", href: "/aesthetics" },
     },
   ],
 };
@@ -129,7 +131,7 @@ export const joinContent = {
   title: "Start Your\nJourney",
   body: "Experience a new standard of personalized wellness with our premium membership offerings. Science-driven performance and recovery tailored to elevate how you feel and how you look. Take the first step toward optimal health.",
   ctaLabel: "Apply for Membership",
-  ctaHref: "https://www.bluprintwellness.com/apply-for-membership",
+  ctaHref: "/apply",
   discoverLabel: "Testimonials",
 };
 
@@ -151,12 +153,21 @@ export const investContent = {
   ],
   body: "\u201CTraining with Jonathan has been unlike any other. He is meticulous in his approach and his understanding of human mechanics is out of this world. What I love even more about Bluprint is the integration between trainer, doctor and other health professionals. I know that everyone has my best interest and they are all working together to make me be my best self.\u201D \u2014 ML",
   ctaLabel: "Begin Your Journey",
-  discoverLabel: "Contact us",
+  discoverLabel: "Apply Now",
 };
 
 export const contactContent = {
   linkText: "Contact us",
   email: "jonathan@bluprintwellness.com",
+};
+
+export const applyContent = {
+  label: "Private Membership",
+  title: "Are You Ready\nTo Commit To\nYour Potential?",
+  body: "Membership at Bluprint Wellness is by application only. We work with a select number of individuals committed to transforming their health, performance, and longevity through our integrated approach.",
+  ctaLabel: "Apply for Membership",
+  discoverLabel: "Get in touch",
+  linkText: "Apply Now",
 };
 
 export const footerContent = {
@@ -176,9 +187,189 @@ export const menuContent = {
     { label: "The Studio", href: "#sphere", target: "sphere" },
     { label: "Membership", href: "#join", target: "join" },
     { label: "Testimonials", href: "#invest", target: "invest" },
+    { label: "Functional Medicine", href: "/functional-medicine", target: "" },
+    { label: "Aesthetics", href: "/aesthetics", target: "" },
+    { label: "Apply", href: "/apply", target: "" },
   ],
   footerTitle: "Contact us here",
   footerEmail: "jonathan@bluprintwellness.com",
+};
+
+export const funcMedContent = {
+  hero: {
+    label: "Functional Medicine",
+    title: "Your Path to\nOptimal Health",
+    body: "Experience our tiered functional medicine approach that takes you from initial consultation to lasting wellness through a personalized, step-by-step journey. Led by Dr. Lain Lye, ND — combining the science of modern functional medicine with the art of natural healing.",
+  },
+  journey: {
+    sideTitle: "Your\nJourney",
+    items: [
+      {
+        num: ".01",
+        title: "Discovery\nConsultation",
+        body: "Your journey begins with a comprehensive 60-minute consultation. Dr. Lye reviews your complete health history, current symptoms, lifestyle factors, and wellness goals to create a personalized roadmap for your care.",
+        image: "/images/desktop/detail-3.webp",
+      },
+      {
+        num: ".02",
+        title: "Advanced\nLab Testing",
+        body: "We go beyond standard bloodwork with comprehensive lab panels — including hormone profiles, metabolic markers, nutrient levels, food sensitivities, and genetic insights — to uncover the root causes behind how you feel.",
+        image: "/images/desktop/focus-3.webp",
+      },
+      {
+        num: ".03",
+        title: "Personalized\nTreatment Plan",
+        body: "Based on your results, Dr. Lye designs a targeted protocol combining nutraceuticals, IV/IM therapy, dietary modifications, and lifestyle interventions tailored to your unique biochemistry.",
+        image: "/images/desktop/focus-2.webp",
+      },
+      {
+        num: ".04",
+        title: "Regenerative\nTherapies",
+        body: "Access advanced modalities including NAD+ IV therapy for cellular repair and energy restoration, targeted nutrient injections, and regenerative protocols designed to optimize your body at the cellular level.",
+        image: "/images/desktop/focus-1.webp",
+      },
+      {
+        num: ".05",
+        title: "Ongoing\nOptimization",
+        body: "Health is a continuum. Through regular follow-ups, retesting, and protocol adjustments, we ensure your treatment evolves with you — always moving toward your highest potential.",
+        image: "/images/desktop/detail-2.webp",
+      },
+    ],
+  },
+  services: [
+    {
+      title: "Naturopathic Consultation",
+      body: "A comprehensive, whole-person medical visit that uncovers the root causes of symptoms and creates a personalized treatment plan using evidence-based natural therapies.",
+      icon: "consultation",
+    },
+    {
+      title: "Nutrient IV/IM Therapy",
+      body: "Targeted vitamins, minerals, and amino acids delivered directly into the bloodstream or muscle to rapidly support energy, metabolism, immunity, recovery, and cellular health.",
+      icon: "iv",
+    },
+    {
+      title: "Comprehensive Lab Testing",
+      body: "Advanced diagnostic testing that evaluates hormones, nutrients, metabolism, inflammation, gut health, and other biomarkers to provide a deep understanding of your health from the inside out.",
+      icon: "lab",
+    },
+    {
+      title: "Regenerative Therapy",
+      body: "A natural healing treatment that uses the body's own restorative cells and growth factors to repair tissue, stimulate collagen, and support long-term recovery and rejuvenation from the inside out.",
+      icon: "regenerative",
+    },
+  ],
+  doctor: {
+    name: "Dr. Lain Lye, ND",
+    title: "Naturopathic & Functional Medicine",
+    bio: "At Amplify Health and Wellness x Bluprint Wellness, Dr. Lain Lye takes a comprehensive and individualized approach to health, combining the science of modern functional medicine with the art of natural healing. With years of experience in naturopathic medicine, Dr. Lye looks beyond symptoms to uncover the root cause of imbalance — addressing physical, emotional, and lifestyle factors that influence overall well-being.",
+    bioExtended: "Dr. Lye believes in empowering patients through education and personalized care, creating treatment plans that may include advanced lab testing, targeted nutraceuticals, herbal medicine, nutrition and lifestyle guidance, and regenerative therapies.",
+    credentials: [
+      { title: "Naturopathic Expertise", body: "Licensed Naturopathic Doctor with years of experience in comprehensive natural medicine." },
+      { title: "Root-Cause Focus", body: "Looks beyond symptoms to uncover the underlying causes of imbalance — addressing physical, emotional, and lifestyle factors." },
+      { title: "Patient-Centered Care", body: "Empowering patients through education, personalized care, and collaborative treatment planning." },
+      { title: "Evidence-Based Approach", body: "Combining scientific rigor with natural healing — integrating advanced diagnostics, targeted therapies, and proven protocols." },
+    ],
+  },
+  partnership: {
+    name: "Amplify Health and Wellness",
+    body: "Our functional medicine services are delivered in partnership with Amplify Health and Wellness — bringing Dr. Lain Lye's expertise directly into the Bluprint Wellness ecosystem for a seamlessly integrated approach to your health.",
+    href: "https://amplifyhealthwellness.com",
+    linkLabel: "Visit Amplify Health",
+  },
+  cta: {
+    label: "Begin Your Journey",
+    title: "Ready To Begin\nYour Journey?",
+    body: "Take the first step toward optimal health with our comprehensive functional medicine approach. Schedule a consultation with Dr. Lain Lye today.",
+    ctaLabel: "Apply for Membership",
+    ctaHref: "/apply",
+  },
+};
+
+export const aestheticsContent = {
+  hero: {
+    label: "Precision Aesthetics",
+    tagline: "Modern. Precision-Driven. Results You Can Trust.",
+    title: "Next-Level Aesthetics\nIn Solana Beach",
+    body: "An elevated, technology-forward aesthetics experience where advanced science, artistry, and wellness converge. This isn\u2019t just a place for treatments \u2014 it\u2019s a destination for confidence, rejuvenation, and feeling your absolute best.",
+    image: "/images/desktop/detail-4.webp",
+  },
+  services: [
+    {
+      title: "Morpheus8 RF Microneedling",
+      subtitle: "Skin Tightening & Collagen Stimulation",
+      body: "Blends microneedling with radiofrequency energy to remodel skin at a deeper level, improving texture, firmness, and overall skin quality.",
+      tag: "Deep remodeling",
+      icon: "morpheus" as const,
+      image: "/images/desktop/detail-4.webp",
+    },
+    {
+      title: "Injectables",
+      subtitle: "Botox\u00AE & Dermal Fillers",
+      body: "Cosmetic injectables for smoothing wrinkles, contouring, and enhancing facial balance. 20+ years of medical expertise for natural-looking results.",
+      tag: "20+ years expertise",
+      icon: "injectables" as const,
+      image: "/images/desktop/focus-4.webp",
+    },
+    {
+      title: "Candela GentleMax Pro Plus",
+      subtitle: "Gold-Standard Laser Services",
+      body: "Dual-wavelength laser technology for hair removal and skin correction. Widely recognized as one of the most advanced laser systems on the market.",
+      tag: "Dual-wavelength",
+      icon: "laser" as const,
+    },
+  ],
+  philosophy: {
+    eyebrow: "Inspired by the effortless beauty of the Solana Beach lifestyle,",
+    heading: "Our space feels calm,\nelevated, and welcoming.",
+    body: "Our studio features industry-leading technologies that deliver powerful, proven results with precision, safety, and minimal downtime.",
+    quote: "Our philosophy is to enhance, refresh, and restore \u2014 never overdo. Subtle, confident, refined results are our signature.",
+    pillars: [
+      {
+        title: "Personalized Care",
+        body: "Every detail \u2014 from consultation to treatment plan \u2014 is intentional, customized, and rooted in expertise.",
+      },
+      {
+        title: "Continuous Innovation",
+        body: "We invest in the latest technology, ongoing education, and evidence-based techniques.",
+      },
+      {
+        title: "Empowering Results",
+        body: "Feeling confident in your skin impacts how you show up in life \u2014 helping you experience that transformation.",
+      },
+    ],
+  },
+  testimonials: {
+    label: "Client Transformations",
+    title: "The BluPrint Difference\nIn Their Words",
+    items: [
+      {
+        initials: "ML",
+        quote: "Training with Jonathan has been unlike any other. He is meticulous in his approach and his understanding of human mechanics is out of this world. What I love even more about Bluprint is the integration between trainer, doctor and other health professionals. I know that everyone has my best interest and they are all working together to make me be my best self.",
+      },
+      {
+        initials: "SC",
+        quote: "I started training with Jonathan at Bluprint Wellness a few weeks ago, and the experience has been exceptional. The facility is absolutely stunning\u2014beautifully designed and incredibly welcoming. The training is intense, challenging, and exactly what I was looking for. Even in just a few weeks, I'm already noticing real results. The recovery services truly complete the experience, making each session feel intentional and balanced. I genuinely look forward to every training session at Bluprint.",
+      },
+    ],
+  },
+  provider: {
+    name: "Suzanne Dean, RN",
+    title: "Registered Nurse & Aesthetic Specialist",
+    bio: "Suzanne brings over 20 years of medical experience, combining clinical knowledge with artistic precision. Certified in Botox\u00AE and dermal fillers with extensive advanced training in aesthetic injectables. Known for meticulous technique and thoughtful approach, Suzanne focuses on natural-looking enhancements, patient safety, and individualized treatment plans.",
+    credentials: [
+      { title: "Registered Nurse", body: "Active RN license with over two decades of clinical practice" },
+      { title: "20+ Years Experience", body: "Extensive background in both medical and aesthetic settings" },
+      { title: "Botox\u00AE Certified", body: "Certified in Botox\u00AE and dermal fillers with advanced injectable training" },
+      { title: "Advanced Injectables", body: "Specialized techniques for natural, artistic results" },
+    ],
+  },
+  cta: {
+    label: "Begin Your Journey",
+    title: "A New Standard\nIn Aesthetics",
+    body: "Secure your appointment and discover the difference of gold-standard equipment paired with expert technique here at BluPrint Aesthetics in Solana Beach.",
+    ctaLabel: "Apply for Membership",
+    ctaHref: "/apply",
+  },
 };
 
 export const loadingImages = [

@@ -7,6 +7,7 @@ interface AccordionItem {
   image?: string;
   desktopImage?: string;
   mobileImage?: string;
+  link?: { label: string; href: string };
 }
 
 interface AccordionProps {
@@ -58,7 +59,7 @@ export default function Accordion({ items, collapseName, variant = "media", clas
             <div className="collapse_title">
               <div className="collapse_title_num">{item.num}</div>
               <div className="collapse_title_txt" data-split="words">
-                <TextWithBreaks text={item.title} />
+                {item.title.replace(/\s*\n\s*/g, " ")}
               </div>
             </div>
             <div className="collapse_content">
@@ -67,6 +68,12 @@ export default function Accordion({ items, collapseName, variant = "media", clas
               </div>
               <div className="collapse_content_body">
                 <div className="collapse_content_txt" data-split="lines">{item.body}</div>
+                {item.link && (
+                  <a href={item.link.href} className="collapse_content_link">
+                    <span>{item.link.label}</span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 8h10M9 4l4 4-4 4" /></svg>
+                  </a>
+                )}
                 {imgSrc && (
                   <div className="collapse_content_media">
                     <img src={imgSrc} alt="" loading="lazy" decoding="async" />

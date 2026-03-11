@@ -28,6 +28,7 @@ export const SECTION_NAMES = [
   "join",
   "invest",
   "contact",
+  "apply",
 ] as const;
 
 export type SectionName = (typeof SECTION_NAMES)[number];
@@ -42,6 +43,7 @@ export const CIRCLE_STATES: Record<string, number> = {
   focus: 7,
   join: 8,
   invest: 8,
+  apply: 8,
 };
 
 export const SECTION_TRANSITIONS: Array<{ from: string; to: string }> = [
@@ -53,6 +55,7 @@ export const SECTION_TRANSITIONS: Array<{ from: string; to: string }> = [
   { from: "experimentation", to: "focus" },
   { from: "focus", to: "join" },
   { from: "join", to: "invest" },
+  { from: "invest", to: "apply" },
 ];
 
 export const NAVBAR_SECTIONS = [

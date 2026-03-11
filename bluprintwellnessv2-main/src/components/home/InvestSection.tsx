@@ -13,18 +13,19 @@ export default function InvestSection() {
 
       <SectionHeader
         title={investContent.title}
-        actions={<Button scrollTo="contact">{investContent.ctaLabel}</Button>}
-        discoverLabel={investContent.discoverLabel}
-        discoverTarget="contact"
+        actions={<Button href="/apply">{investContent.ctaLabel}</Button>}
       />
 
       <div className="invest_testimonials ls-stagger">
-        {investContent.testimonials.map((t, i) => (
-          <div key={i} className="invest_testimonial ls-appear" data-scroll data-scroll-offset="20%">
-            <div className="invest_testimonial_quote">&ldquo;{t.quote}&rdquo;</div>
-            <div className="invest_testimonial_author">— {t.author}</div>
-          </div>
-        ))}
+        {investContent.testimonials.map((t, i) => {
+          const speeds = ["-0.15", "0", "0.15"];
+          return (
+            <div key={i} className="invest_testimonial ls-appear" data-scroll data-scroll-offset="20%" data-scroll-speed={speeds[i % 3]} data-magnetic-testimonial>
+              <div className="invest_testimonial_quote">&ldquo;{t.quote}&rdquo;</div>
+              <div className="invest_testimonial_author">{t.author}</div>
+            </div>
+          );
+        })}
       </div>
 
       <ContactSection />

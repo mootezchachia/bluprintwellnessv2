@@ -82,7 +82,7 @@ export default function Navbar({ onMenuToggle }: NavbarProps) {
       </div>
 
       <div className="navbar_actions">
-        <Button scrollTo="contact" dataSplitLabel="char">Contact</Button>
+        <Button href="/apply" dataSplitLabel="char">Apply</Button>
         <AmbientSound />
       </div>
 

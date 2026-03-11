@@ -44,6 +44,10 @@ export default function AnimationController() {
       const { target, way } = (e as CustomEvent).detail;
       if (way !== "enter") return;
 
+      // Skip animation for FM hero — title should be visible immediately
+      if (target.closest(".pSection--funcMedHero")) return;
+      if (target.closest(".pSection--aestheticsHero")) return;
+
       const label = target.querySelector(".st4");
       const titleWords = [...(target.querySelector(".st1")?.querySelectorAll(".word") || [])];
       const footer = target.querySelector(".pSection_header_footer");
@@ -669,6 +673,17 @@ export default function AnimationController() {
           })
         );
       }
+
+      // Magnetic testimonial cards (subtle)
+      document.querySelectorAll("[data-magnetic-testimonial]").forEach((card) => {
+        magneticCleanups.push(
+          initMagnetic(card as HTMLElement, {
+            strength: 0.12,
+            innerStrength: 0,
+            threshold: 100,
+          })
+        );
+      });
     }, 600);
 
     // Register all event listeners

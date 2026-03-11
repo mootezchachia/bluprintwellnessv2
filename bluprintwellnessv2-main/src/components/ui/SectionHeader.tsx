@@ -43,11 +43,10 @@ export default function SectionHeader({
         <div className="pSection_header_content">
           <div className="pSection_header_title">
             {label && <span className="st4">{label}</span>}
-            <TitleTag className="st1" data-split>
+            <TitleTag className="st1">
               {titleParts.map((part, i) => (
-                <span key={i}>
+                <span key={i} style={{ display: 'block' }} data-split>
                   {part}
-                  {i < titleParts.length - 1 && <br />}
                 </span>
               ))}
             </TitleTag>

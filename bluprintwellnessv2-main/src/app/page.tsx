@@ -12,6 +12,7 @@ import SportSection from "@/components/home/SportSection";
 import SphereLabSection from "@/components/home/SphereLabSection";
 import JoinSection from "@/components/home/JoinSection";
 import InvestSection from "@/components/home/InvestSection";
+import ApplySection from "@/components/home/ApplySection";
 import Navbar from "@/components/layout/Navbar";
 import MobileMenu from "@/components/layout/MobileMenu";
 import Footer from "@/components/layout/Footer";
@@ -57,6 +58,7 @@ function HomeContent() {
       <SphereLabSection />
       <JoinSection />
       <InvestSection />
+      <ApplySection />
 
       <div className="scrollingMask" />
       <Circles />
