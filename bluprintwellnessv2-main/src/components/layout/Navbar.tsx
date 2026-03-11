@@ -5,7 +5,6 @@ import { useLenis } from "@/hooks/useLenis";
 import { scrollEvents } from "@/lib/scroll-events";
 import Button from "@/components/ui/Button";
 import AmbientSound from "@/components/decorative/AmbientSound";
-import PageSidebar from "@/components/layout/PageSidebar";
 
 interface NavbarProps {
   onMenuToggle: () => void;
@@ -14,7 +13,6 @@ interface NavbarProps {
 export default function Navbar({ onMenuToggle }: NavbarProps) {
   const [activeSection, setActiveSection] = useState("intro");
   const [progressWidth, setProgressWidth] = useState(0);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { scrollTo } = useLenis();
 
   useEffect(() => {
@@ -83,24 +81,12 @@ export default function Navbar({ onMenuToggle }: NavbarProps) {
         <div className="navbar_actions">
           <Button href="/apply" dataSplitLabel="char">Apply</Button>
           <AmbientSound />
-          <button
-            type="button"
-            className="navbar_sidebarToggle"
-            aria-label="Explore pages"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M8 0l1.8 6.2L16 8l-6.2 1.8L8 16l-1.8-6.2L0 8l6.2-1.8z" />
-            </svg>
-          </button>
         </div>
 
         <button type="button" className="navbar_menuToggle" aria-label="Toggle menu" onClick={onMenuToggle}>
           <span /><span /><span />
         </button>
       </div>
-
-      <PageSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
     </>
   );
 }
