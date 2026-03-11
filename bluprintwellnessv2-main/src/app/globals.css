@@ -1034,6 +1034,9 @@ button,
   min-width: auto;
   padding: 12px 15px;
 }
+.button--empty .button_circle {
+  display: none;
+}
 
 /* ═══════════════════════════════════════════
    BUTTON DISCOVER
