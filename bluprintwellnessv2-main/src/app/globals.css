@@ -2763,6 +2763,65 @@ html.custom-cursor * {
   font-weight: 400;
 }
 
+/* Checkbox & radio groups */
+.applyWizard_checkboxGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.applyWizard_checkbox,
+.applyWizard_radio {
+  padding: 10px 18px;
+  font-size: 0.929rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-smooth);
+  line-height: 1.4;
+  text-align: left;
+}
+.applyWizard_checkbox:hover,
+.applyWizard_radio:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.85);
+}
+.applyWizard_checkbox.selected,
+.applyWizard_radio.selected {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+/* Agreement */
+.applyWizard_agreement {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.applyWizard_agreementLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+}
+.applyWizard_agreementCheckbox {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  margin-top: 2px;
+  accent-color: #fff;
+  cursor: pointer;
+}
+.applyWizard_agreementText {
+  font-size: 0.929rem;
+  line-height: 1.6;
+  opacity: 0.7;
+}
+
 /* Wizard slide animation */
 @keyframes wizardSlideIn {
   from {

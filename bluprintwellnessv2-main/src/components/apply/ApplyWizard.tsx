@@ -8,21 +8,30 @@ import Link from "next/link";
 /* ------------------------------------------------------------------ */
 
 interface FormData {
-  /* Step 1 — About You */
+  /* Step 0 — About You */
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
-  /* Step 2 — Your Life */
-  age: string;
-  occupation: string;
-  activityLevel: string;
-  /* Step 3 — Your Goals */
-  primaryGoal: string;
-  timeline: string;
-  /* Step 4 — Your Why */
-  motivation: string;
-  hearAbout: string;
+  hearAbout: string[];
+  referralName: string;
+  /* Step 1 — Location & Work */
+  location: string;
+  workRhythm: string;
+  aboutWork: string;
+  /* Step 2 — Your Interests */
+  drawsYou: string[];
+  mostInterested: string[];
+  /* Step 3 — Your Vision */
+  whyMember: string;
+  investingHealth: string;
+  hopingToChange: string;
+  /* Step 4 — Final Details */
+  beginMembership: string;
+  bestTimeToReach: string;
+  anythingElse: string;
+  /* Step 5 — Review */
+  agreement: boolean;
 }
 
 const INITIAL: FormData = {
@@ -30,46 +39,77 @@ const INITIAL: FormData = {
   lastName: "",
   email: "",
   phone: "",
-  age: "",
-  occupation: "",
-  activityLevel: "",
-  primaryGoal: "",
-  timeline: "",
-  motivation: "",
-  hearAbout: "",
+  hearAbout: [],
+  referralName: "",
+  location: "",
+  workRhythm: "",
+  aboutWork: "",
+  drawsYou: [],
+  mostInterested: [],
+  whyMember: "",
+  investingHealth: "",
+  hopingToChange: "",
+  beginMembership: "",
+  bestTimeToReach: "",
+  anythingElse: "",
+  agreement: false,
 };
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
 
-const ACTIVITY_LEVELS = [
-  "Sedentary",
-  "Lightly Active",
-  "Moderately Active",
-  "Very Active",
-  "Competitive Athlete",
-];
-
-const GOALS = [
-  "Performance Training",
-  "Advanced Recovery",
-  "Functional Medicine",
-  "Precision Aesthetics",
-  "Integrated Wellness (All)",
-];
-
-const TIMELINES = [
-  "Immediately",
-  "Within 1 Month",
-  "Within 3 Months",
-  "Exploring Options",
-];
-
-const HEAR_ABOUT = [
-  "Referral",
+const HEAR_ABOUT_OPTIONS = [
+  "Referred by Friend or Member(s)",
   "Social Media",
-  "Google Search",
-  "Press / Media",
+  "Web Search",
+  "Practitioner Referral",
+  "Press / News",
+  "Event",
   "Other",
+];
+
+const REFERRAL_TRIGGERS = [
+  "Referred by Friend or Member(s)",
+  "Practitioner Referral",
+];
+
+const LOCATION_OPTIONS = [
+  "I currently live in North County San Diego",
+  "I currently live in North County San Diego part time",
+  "I live in San Diego",
+  "I live outside of San Diego",
+];
+
+const WORK_RHYTHM_OPTIONS = [
+  "I work fully remote",
+  "I work hybrid",
+  "I own my own company",
+  "I freelance/consult/create",
+  "I work in person",
+];
+
+const DRAWS_YOU_OPTIONS = [
+  "Performance and Strength",
+  "Longevity & Aging Optimization",
+  "Recovery and Nervous System Regulation",
+  "Medical Optimization",
+  "Community and Environment",
+  "Accountability and Structure",
+];
+
+const MOST_INTERESTED_OPTIONS = [
+  "Personal Training",
+  "AI incorporated Gym Equipment",
+  "Functional Medicine",
+  "Aesthetic Treatments",
+  "Recovery Modalities",
+  "Social/Community Building",
+  "Concierge Wellness",
+];
+
+const BEGIN_MEMBERSHIP_OPTIONS = [
+  "Immediately",
+  "Within 1-3 months",
+  "Just exploring",
 ];
 
 /* ------------------------------------------------------------------ */
@@ -83,7 +123,7 @@ export default function ApplyWizard() {
 
   /* ---- helpers --------------------------------------------------- */
 
-  const set = useCallback(
+  const setTextField = useCallback(
     (field: keyof FormData) =>
       (
         e: React.ChangeEvent<
@@ -94,6 +134,32 @@ export default function ApplyWizard() {
     [],
   );
 
+  const toggleCheckbox = useCallback(
+    (field: keyof FormData, value: string) => () => {
+      setData((prev) => {
+        const arr = prev[field] as string[];
+        return {
+          ...prev,
+          [field]: arr.includes(value)
+            ? arr.filter((v) => v !== value)
+            : [...arr, value],
+        };
+      });
+    },
+    [],
+  );
+
+  const setRadio = useCallback(
+    (field: keyof FormData, value: string) => () => {
+      setData((prev) => ({ ...prev, [field]: value }));
+    },
+    [],
+  );
+
+  const showReferralInput = data.hearAbout.some((v) =>
+    REFERRAL_TRIGGERS.includes(v),
+  );
+
   const canContinue = useCallback((): boolean => {
     switch (step) {
       case 0:
@@ -101,20 +167,30 @@ export default function ApplyWizard() {
           data.firstName.trim() &&
           data.lastName.trim() &&
           data.email.trim() &&
-          data.phone.trim()
+          data.phone.trim() &&
+          data.hearAbout.length > 0
         );
       case 1:
         return !!(
-          data.age.trim() &&
-          data.occupation.trim() &&
-          data.activityLevel
+          data.location &&
+          data.workRhythm &&
+          data.aboutWork.trim()
         );
       case 2:
-        return !!(data.primaryGoal && data.timeline);
+        return !!(data.drawsYou.length > 0 && data.mostInterested.length > 0);
       case 3:
-        return !!data.motivation.trim();
+        return !!(
+          data.whyMember.trim() &&
+          data.investingHealth.trim() &&
+          data.hopingToChange.trim()
+        );
       case 4:
-        return true;
+        return !!(
+          data.beginMembership &&
+          data.bestTimeToReach.trim()
+        );
+      case 5:
+        return data.agreement;
       default:
         return false;
     }
@@ -146,23 +222,37 @@ export default function ApplyWizard() {
 
     const body = encodeURIComponent(
       [
-        `ABOUT`,
+        `ABOUT YOU`,
         `Name: ${data.firstName} ${data.lastName}`,
         `Email: ${data.email}`,
         `Phone: ${data.phone}`,
+        `How did you hear about Bluprint: ${data.hearAbout.join(", ")}`,
+        ...(data.referralName
+          ? [`Referral Name: ${data.referralName}`]
+          : []),
         ``,
-        `LIFE`,
-        `Age: ${data.age}`,
-        `Occupation: ${data.occupation}`,
-        `Activity Level: ${data.activityLevel}`,
+        `LOCATION & WORK`,
+        `Current Location: ${data.location}`,
+        `Work Rhythm: ${data.workRhythm}`,
+        `About Work: ${data.aboutWork}`,
         ``,
-        `GOALS`,
-        `Primary Goal: ${data.primaryGoal}`,
-        `Timeline: ${data.timeline}`,
+        `INTERESTS`,
+        `What draws you to Bluprint: ${data.drawsYou.join(", ")}`,
+        `Most interested in: ${data.mostInterested.join(", ")}`,
         ``,
-        `WHY`,
-        `Motivation: ${data.motivation}`,
-        `Heard About Us: ${data.hearAbout || "—"}`,
+        `VISION`,
+        `Why become a member: ${data.whyMember}`,
+        `Investing in health means: ${data.investingHealth}`,
+        `Hoping to change: ${data.hopingToChange}`,
+        ``,
+        `FINAL DETAILS`,
+        `Begin membership: ${data.beginMembership}`,
+        `Best time to reach: ${data.bestTimeToReach}`,
+        ...(data.anythingElse
+          ? [`Anything else: ${data.anythingElse}`]
+          : []),
+        ``,
+        `Membership Agreement: Accepted`,
       ].join("\n"),
     );
 
@@ -187,40 +277,10 @@ export default function ApplyWizard() {
         id={field}
         className="applyWizard_input"
         type={type}
-        value={data[field]}
-        onChange={set(field)}
+        value={data[field] as string}
+        onChange={setTextField(field)}
         required={required}
       />
-    </div>
-  );
-
-  const renderSelect = (
-    label: string,
-    field: keyof FormData,
-    options: string[],
-    required: boolean = true,
-  ) => (
-    <div className="applyWizard_field" key={field}>
-      <label className="applyWizard_label" htmlFor={field}>
-        {label}
-        {required && <span className="applyWizard_required">*</span>}
-      </label>
-      <select
-        id={field}
-        className="applyWizard_select"
-        value={data[field]}
-        onChange={set(field)}
-        required={required}
-      >
-        <option value="" disabled>
-          Select...
-        </option>
-        {options.map((o) => (
-          <option key={o} value={o}>
-            {o}
-          </option>
-        ))}
-      </select>
     </div>
   );
 
@@ -237,11 +297,69 @@ export default function ApplyWizard() {
       <textarea
         id={field}
         className="applyWizard_textarea"
-        value={data[field]}
-        onChange={set(field)}
+        value={data[field] as string}
+        onChange={setTextField(field)}
         required={required}
         rows={5}
       />
+    </div>
+  );
+
+  const renderCheckboxGroup = (
+    label: string,
+    field: keyof FormData,
+    options: string[],
+    required: boolean = true,
+  ) => (
+    <div className="applyWizard_field" key={field}>
+      <label className="applyWizard_label">
+        {label}
+        {required && <span className="applyWizard_required">*</span>}
+      </label>
+      <div className="applyWizard_checkboxGroup">
+        {options.map((option) => {
+          const selected = (data[field] as string[]).includes(option);
+          return (
+            <button
+              key={option}
+              type="button"
+              className={`applyWizard_checkbox${selected ? " selected" : ""}`}
+              onClick={toggleCheckbox(field, option)}
+            >
+              {option}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  const renderRadioGroup = (
+    label: string,
+    field: keyof FormData,
+    options: string[],
+    required: boolean = true,
+  ) => (
+    <div className="applyWizard_field" key={field}>
+      <label className="applyWizard_label">
+        {label}
+        {required && <span className="applyWizard_required">*</span>}
+      </label>
+      <div className="applyWizard_checkboxGroup">
+        {options.map((option) => {
+          const selected = data[field] === option;
+          return (
+            <button
+              key={option}
+              type="button"
+              className={`applyWizard_radio${selected ? " selected" : ""}`}
+              onClick={setRadio(field, option)}
+            >
+              {option}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 
@@ -249,66 +367,136 @@ export default function ApplyWizard() {
 
   const stepTitles = [
     "About You",
-    "Your Life",
-    "Your Goals",
-    "Your Why",
-    "Confirm",
+    "Location & Work",
+    "Your Interests",
+    "Your Vision",
+    "Final Details",
+    "Review & Submit",
   ];
 
   const stepBodies = [
     "Let us know who you are so we can personalise your experience.",
-    "A few details about your current lifestyle.",
-    "Tell us what you want to achieve.",
-    "What drives you to pursue this?",
+    "Tell us about where you are and what you do.",
+    "What aspects of Bluprint resonate with you?",
+    "Help us understand your wellness goals.",
+    "Just a few more details before you submit.",
     "Review your application before submitting.",
   ];
 
   const renderStepFields = () => {
     switch (step) {
+      /* Step 0 — About You */
       case 0:
         return (
           <div className="applyWizard_fields">
             {renderField("First Name", "firstName")}
             {renderField("Last Name", "lastName")}
             {renderField("Email", "email", "email")}
-            {renderField("Phone", "phone", "tel")}
-          </div>
-        );
-      case 1:
-        return (
-          <div className="applyWizard_fields">
-            {renderField("Age", "age")}
-            {renderField("Occupation", "occupation")}
-            {renderSelect(
-              "Activity Level",
-              "activityLevel",
-              ACTIVITY_LEVELS,
+            {renderField("Phone Number", "phone", "tel")}
+            {renderCheckboxGroup(
+              "How did you hear about Bluprint?",
+              "hearAbout",
+              HEAR_ABOUT_OPTIONS,
+            )}
+            {showReferralInput && (
+              <div className="applyWizard_field">
+                <label className="applyWizard_label" htmlFor="referralName">
+                  Referral Name
+                </label>
+                <input
+                  id="referralName"
+                  className="applyWizard_input"
+                  type="text"
+                  value={data.referralName}
+                  onChange={setTextField("referralName")}
+                  placeholder="Who referred you?"
+                />
+              </div>
             )}
           </div>
         );
+
+      /* Step 1 — Location & Work */
+      case 1:
+        return (
+          <div className="applyWizard_fields">
+            {renderRadioGroup(
+              "What best describes your current location?",
+              "location",
+              LOCATION_OPTIONS,
+            )}
+            {renderRadioGroup(
+              "What best describes your daily work rhythm?",
+              "workRhythm",
+              WORK_RHYTHM_OPTIONS,
+            )}
+            {renderTextarea("Tell us about your work", "aboutWork")}
+          </div>
+        );
+
+      /* Step 2 — Your Interests */
       case 2:
         return (
           <div className="applyWizard_fields">
-            {renderSelect("Primary Goal", "primaryGoal", GOALS)}
-            {renderSelect("Timeline", "timeline", TIMELINES)}
+            {renderCheckboxGroup(
+              "What draws you to Bluprint?",
+              "drawsYou",
+              DRAWS_YOU_OPTIONS,
+            )}
+            {renderCheckboxGroup(
+              "What aspect of Bluprint are you most interested in?",
+              "mostInterested",
+              MOST_INTERESTED_OPTIONS,
+            )}
           </div>
         );
+
+      /* Step 3 — Your Vision */
       case 3:
         return (
           <div className="applyWizard_fields">
-            {renderTextarea("What motivates you to join?", "motivation")}
-            {renderSelect(
-              "How did you hear about us?",
-              "hearAbout",
-              HEAR_ABOUT,
+            {renderTextarea(
+              "Why would you like to become a member and how do you see yourself using Bluprint Wellness?",
+              "whyMember",
+            )}
+            {renderTextarea(
+              'What does "investing in your health" mean to you?',
+              "investingHealth",
+            )}
+            {renderTextarea(
+              "What are you hoping to change or improve in the next year?",
+              "hopingToChange",
+            )}
+          </div>
+        );
+
+      /* Step 4 — Final Details */
+      case 4:
+        return (
+          <div className="applyWizard_fields">
+            {renderRadioGroup(
+              "Are you looking to begin membership:",
+              "beginMembership",
+              BEGIN_MEMBERSHIP_OPTIONS,
+            )}
+            {renderField(
+              "Please let us know the best time to reach you",
+              "bestTimeToReach",
+            )}
+            {renderTextarea(
+              "Is there anything else you'd like us to know about you?",
+              "anythingElse",
               false,
             )}
           </div>
         );
-      case 4:
+
+      /* Step 5 — Review & Submit */
+      case 5:
         return (
           <div className="applyWizard_confirm">
             <div className="applyWizard_summary">
+              {/* About You */}
               <div className="applyWizard_summary_group">
                 <span className="applyWizard_summary_label">About You</span>
                 <div className="applyWizard_summary_row">
@@ -329,70 +517,160 @@ export default function ApplyWizard() {
                     {data.phone}
                   </span>
                 </div>
-              </div>
-
-              <div className="applyWizard_summary_group">
-                <span className="applyWizard_summary_label">Your Life</span>
-                <div className="applyWizard_summary_row">
-                  <span className="applyWizard_summary_key">Age</span>
-                  <span className="applyWizard_summary_value">{data.age}</span>
-                </div>
-                <div className="applyWizard_summary_row">
-                  <span className="applyWizard_summary_key">Occupation</span>
-                  <span className="applyWizard_summary_value">
-                    {data.occupation}
-                  </span>
-                </div>
                 <div className="applyWizard_summary_row">
                   <span className="applyWizard_summary_key">
-                    Activity Level
+                    How did you hear
                   </span>
                   <span className="applyWizard_summary_value">
-                    {data.activityLevel}
+                    {data.hearAbout.join(", ")}
                   </span>
                 </div>
-              </div>
-
-              <div className="applyWizard_summary_group">
-                <span className="applyWizard_summary_label">Your Goals</span>
-                <div className="applyWizard_summary_row">
-                  <span className="applyWizard_summary_key">
-                    Primary Goal
-                  </span>
-                  <span className="applyWizard_summary_value">
-                    {data.primaryGoal}
-                  </span>
-                </div>
-                <div className="applyWizard_summary_row">
-                  <span className="applyWizard_summary_key">Timeline</span>
-                  <span className="applyWizard_summary_value">
-                    {data.timeline}
-                  </span>
-                </div>
-              </div>
-
-              <div className="applyWizard_summary_group">
-                <span className="applyWizard_summary_label">Your Why</span>
-                <div className="applyWizard_summary_row">
-                  <span className="applyWizard_summary_key">Motivation</span>
-                  <span className="applyWizard_summary_value">
-                    {data.motivation}
-                  </span>
-                </div>
-                {data.hearAbout && (
+                {data.referralName && (
                   <div className="applyWizard_summary_row">
                     <span className="applyWizard_summary_key">
-                      Heard About Us
+                      Referral Name
                     </span>
                     <span className="applyWizard_summary_value">
-                      {data.hearAbout}
+                      {data.referralName}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Location & Work */}
+              <div className="applyWizard_summary_group">
+                <span className="applyWizard_summary_label">
+                  Location & Work
+                </span>
+                <div className="applyWizard_summary_row">
+                  <span className="applyWizard_summary_key">Location</span>
+                  <span className="applyWizard_summary_value">
+                    {data.location}
+                  </span>
+                </div>
+                <div className="applyWizard_summary_row">
+                  <span className="applyWizard_summary_key">Work Rhythm</span>
+                  <span className="applyWizard_summary_value">
+                    {data.workRhythm}
+                  </span>
+                </div>
+                <div className="applyWizard_summary_row">
+                  <span className="applyWizard_summary_key">About Work</span>
+                  <span className="applyWizard_summary_value">
+                    {data.aboutWork}
+                  </span>
+                </div>
+              </div>
+
+              {/* Your Interests */}
+              <div className="applyWizard_summary_group">
+                <span className="applyWizard_summary_label">
+                  Your Interests
+                </span>
+                <div className="applyWizard_summary_row">
+                  <span className="applyWizard_summary_key">
+                    What draws you
+                  </span>
+                  <span className="applyWizard_summary_value">
+                    {data.drawsYou.join(", ")}
+                  </span>
+                </div>
+                <div className="applyWizard_summary_row">
+                  <span className="applyWizard_summary_key">
+                    Most interested in
+                  </span>
+                  <span className="applyWizard_summary_value">
+                    {data.mostInterested.join(", ")}
+                  </span>
+                </div>
+              </div>
+
+              {/* Your Vision */}
+              <div className="applyWizard_summary_group">
+                <span className="applyWizard_summary_label">Your Vision</span>
+                <div className="applyWizard_summary_row">
+                  <span className="applyWizard_summary_key">Why member</span>
+                  <span className="applyWizard_summary_value">
+                    {data.whyMember}
+                  </span>
+                </div>
+                <div className="applyWizard_summary_row">
+                  <span className="applyWizard_summary_key">
+                    Investing in health
+                  </span>
+                  <span className="applyWizard_summary_value">
+                    {data.investingHealth}
+                  </span>
+                </div>
+                <div className="applyWizard_summary_row">
+                  <span className="applyWizard_summary_key">
+                    Hoping to change
+                  </span>
+                  <span className="applyWizard_summary_value">
+                    {data.hopingToChange}
+                  </span>
+                </div>
+              </div>
+
+              {/* Final Details */}
+              <div className="applyWizard_summary_group">
+                <span className="applyWizard_summary_label">
+                  Final Details
+                </span>
+                <div className="applyWizard_summary_row">
+                  <span className="applyWizard_summary_key">
+                    Begin membership
+                  </span>
+                  <span className="applyWizard_summary_value">
+                    {data.beginMembership}
+                  </span>
+                </div>
+                <div className="applyWizard_summary_row">
+                  <span className="applyWizard_summary_key">
+                    Best time to reach
+                  </span>
+                  <span className="applyWizard_summary_value">
+                    {data.bestTimeToReach}
+                  </span>
+                </div>
+                {data.anythingElse && (
+                  <div className="applyWizard_summary_row">
+                    <span className="applyWizard_summary_key">
+                      Anything else
+                    </span>
+                    <span className="applyWizard_summary_value">
+                      {data.anythingElse}
                     </span>
                   </div>
                 )}
               </div>
             </div>
+
+            {/* Membership Agreement */}
+            <div className="applyWizard_agreement">
+              <label className="applyWizard_agreementLabel">
+                <input
+                  type="checkbox"
+                  className="applyWizard_agreementCheckbox"
+                  checked={data.agreement}
+                  onChange={(e) =>
+                    setData((prev) => ({
+                      ...prev,
+                      agreement: e.target.checked,
+                    }))
+                  }
+                />
+                <span className="applyWizard_agreementText">
+                  Yes, I understand that Bluprint Wellness is a membership-based
+                  wellness studio and agree to be contacted regarding my
+                  application.
+                  <span className="applyWizard_required">*</span>
+                </span>
+              </label>
+            </div>
           </div>
         );
+
       default:
         return null;
     }
@@ -465,7 +743,8 @@ export default function ApplyWizard() {
       {/* Step content — key triggers re-mount for slide-in animation */}
       <div className="applyWizard_inner" key={step}>
         <span className="applyWizard_step st4">
-          {String(step + 1).padStart(2, "0")} / {String(TOTAL_STEPS).padStart(2, "0")}
+          {String(step + 1).padStart(2, "0")} /{" "}
+          {String(TOTAL_STEPS).padStart(2, "0")}
         </span>
         <h2 className="applyWizard_title">{stepTitles[step]}</h2>
         <p className="applyWizard_body">{stepBodies[step]}</p>
@@ -501,6 +780,7 @@ export default function ApplyWizard() {
             <button
               type="button"
               className="button"
+              disabled={!canContinue()}
               onClick={handleSubmit}
             >
               <span className="button_circle" />
