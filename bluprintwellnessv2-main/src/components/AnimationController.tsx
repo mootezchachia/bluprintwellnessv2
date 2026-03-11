@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { animate, stagger, remove } from "animejs";
-import { scrambleReveal, scrambleText } from "@/lib/text-scramble";
+import { scrambleReveal } from "@/lib/text-scramble";
 import { initMagnetic, destroyAllMagnetic } from "@/lib/magnetic";
 
 // Smart scroll-to function with scrollingMask for long distances
@@ -547,11 +547,9 @@ export default function AnimationController() {
       });
     });
 
-    // ====== BUTTON HOVER — scramble + slide ======
+    // ====== BUTTON HOVER — slide ======
     document.querySelectorAll(".button:not(.button--empty)").forEach((btn) => {
       btn.addEventListener("mouseenter", () => {
-        const label = btn.querySelector(".button_label") as HTMLElement;
-        if (label) scrambleText(label, { duration: 400, staggerPerChar: 20 });
         const chars = [...btn.querySelectorAll(".char")];
         if (chars.length) {
           animate(chars, {
