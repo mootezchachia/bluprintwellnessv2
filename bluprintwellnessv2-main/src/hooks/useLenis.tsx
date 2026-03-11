@@ -77,7 +77,7 @@ export function LenisProvider({
         lenisOptions: {
           wheelMultiplier: getWheelMultiplier(),
           syncTouch: true,
-          touchMultiplier: 12,
+          touchMultiplier: 2,
           lerp: 0.1,
           duration: 0.75,
           easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
