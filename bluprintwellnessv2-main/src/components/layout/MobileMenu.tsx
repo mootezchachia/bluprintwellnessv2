@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
-import Link from "next/link";
+import { useCallback, useEffect } from "react";
 import { useLenis } from "@/hooks/useLenis";
 import { menuContent } from "@/data/content";
+import Button from "@/components/ui/Button";
 import AmbientSound from "@/components/decorative/AmbientSound";
 
 interface MobileMenuProps {
@@ -12,8 +12,9 @@ interface MobileMenuProps {
 }
 
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
-  const { start, stop } = useLenis();
+  const { scrollTo, start, stop } = useLenis();
 
+  // Stop/start Lenis when menu opens/closes
   useEffect(() => {
     if (isOpen) {
       stop();
@@ -21,6 +22,16 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       start();
     }
   }, [isOpen, start, stop]);
+
+  const handleNavigate = useCallback((target: string) => {
+    onClose();
+    start(); // Re-enable Lenis
+    // Small delay to let menu close, then scroll
+    setTimeout(() => {
+      const el = document.querySelector(`[data-scroll-target="${target}"]`);
+      if (el) scrollTo(el as HTMLElement);
+    }, 150);
+  }, [onClose, scrollTo, start]);
 
   return (
     <div className={`menu ${isOpen ? "open" : ""}`} data-lenis-prevent>
@@ -38,19 +49,24 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           <ul>
             {menuContent.nav.map((item, i) => (
               <li key={i}>
-                <Link href={item.href} onClick={onClose}>
+                <a
+                  href={item.href}
+                  data-menu-target={item.target}
+                  onClick={(e) => { e.preventDefault(); handleNavigate(item.target); }}
+                >
                   {item.isLogo ? (
                     <img src="/images/logo-small.svg" alt="Bluprint Wellness" />
                   ) : (
                     item.label
                   )}
-                </Link>
+                </a>
               </li>
             ))}
           </ul>
         </nav>
 
         <div className="menu_actions">
+          <Button scrollTo="contact" onClick={onClose} dataSplitLabel="char">Contact</Button>
           <AmbientSound />
         </div>
 

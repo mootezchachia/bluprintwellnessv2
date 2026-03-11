@@ -183,10 +183,13 @@ export const footerContent = {
 
 export const menuContent = {
   nav: [
-    { label: "", href: "/", isLogo: true },
-    { label: "Functional Medicine", href: "/functional-medicine" },
-    { label: "Aesthetics", href: "/aesthetics" },
-    { label: "Apply", href: "/apply" },
+    { label: "", href: "#home", target: "hero", isLogo: true },
+    { label: "The Studio", href: "#sphere", target: "sphere" },
+    { label: "Membership", href: "#join", target: "join" },
+    { label: "Testimonials", href: "#invest", target: "invest" },
+    { label: "Functional Medicine", href: "/functional-medicine", target: "" },
+    { label: "Aesthetics", href: "/aesthetics", target: "" },
+    { label: "Apply", href: "/apply", target: "" },
   ],
   footerTitle: "Contact us here",
   footerEmail: "jonathan@bluprintwellness.com",
