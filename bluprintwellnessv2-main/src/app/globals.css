@@ -613,12 +613,7 @@ button,
 }
 
 .navbar_nav {
-  display: flex;
-  gap: 30px;
-  padding: 0 30px;
-}
-@media (max-width: 979px) {
-  .navbar_nav { display: none; }
+  display: none;
 }
 
 .navbar_nav_link {
