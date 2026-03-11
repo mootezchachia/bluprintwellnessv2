@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { useLenis } from "@/hooks/useLenis";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import { scrollEvents } from "@/lib/scroll-events";
 import Button from "@/components/ui/Button";
 import AmbientSound from "@/components/decorative/AmbientSound";
@@ -11,14 +11,8 @@ interface NavbarProps {
 }
 
 export default function Navbar({ onMenuToggle }: NavbarProps) {
-  const [activeSection, setActiveSection] = useState("intro");
   const [progressWidth, setProgressWidth] = useState(0);
-  const { scrollTo } = useLenis();
 
-  // Navbar visibility is controlled by post-loading revealAfterLoading()
-  // which sets opacity: 1 directly on the navbar element
-
-  // Listen for scroll data from LenisProvider to update progress bar
   useEffect(() => {
     const handleScrollUpdate = (args: { progress: number }) => {
       setProgressWidth(args.progress * 100);
@@ -27,57 +21,36 @@ export default function Navbar({ onMenuToggle }: NavbarProps) {
     return () => { scrollEvents.off("scrollUpdate", handleScrollUpdate); };
   }, []);
 
-  const handleNavClick = useCallback((target: string) => {
-    const el = document.querySelector(`[data-scroll-target="${target}"]`);
-    if (el) scrollTo(el as HTMLElement);
-  }, [scrollTo]);
-
-  const navLinks = [
-    { target: "sphere", label: "The Studio", section: "sphere" },
-    { target: "join", label: "Membership", section: "join" },
-    { target: "invest", label: "Testimonials", section: "invest" },
+  const pageLinks = [
+    { href: "/functional-medicine", label: "Functional Medicine" },
+    { href: "/aesthetics", label: "Aesthetics" },
   ];
 
   return (
     <div className="navbar" style={{ opacity: 0 }}>
       <div className="navbar_main">
         <div className="navbar_logo">
-          <a href="#home" className="active" data-scroll-to="hero" onClick={(e) => { e.preventDefault(); handleNavClick("hero"); }}>
+          <Link href="/">
             <img src="/images/logo-small.svg" alt="Bluprint Wellness" />
-          </a>
+          </Link>
         </div>
 
         <nav className="navbar_nav">
-          {navLinks.map((link) => (
-            <a
-              key={link.target}
-              href={`#${link.target}`}
-              className={`navbar_nav_link ${activeSection === link.section ? "active" : ""}`}
-              data-scroll-to={link.target}
-              onClick={(e) => { e.preventDefault(); handleNavClick(link.target); }}
+          {pageLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="navbar_nav_link"
             >
               <span />
-              <span data-split="chars">{link.label}</span>
-            </a>
+              <span>{link.label}</span>
+            </Link>
           ))}
         </nav>
 
         <div className="navbar_progress">
           <div className="navbar_progress_track" />
           <div className="navbar_progress_bar" style={{ transform: `scaleX(${progressWidth / 100})` }} />
-          {["intro", "sphere", "join", "invest"].map((section) => (
-            <span
-              key={section}
-              className={`navbar_progress_section ${activeSection === section ? "active" : ""}`}
-              data-section={section}
-              onClick={() => {
-                const targets: Record<string, string> = { intro: "hero", sphere: "sphere", join: "join", invest: "invest" };
-                handleNavClick(targets[section]);
-              }}
-            >
-              <span />
-            </span>
-          ))}
         </div>
       </div>
 
