@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { animate, stagger, remove } from "animejs";
-import { scrambleReveal } from "@/lib/text-scramble";
+
 import { initMagnetic, destroyAllMagnetic } from "@/lib/magnetic";
 
 // Smart scroll-to function with scrollingMask for long distances
@@ -62,9 +62,15 @@ export default function AnimationController() {
 
       let delay = 0;
 
-      // Label reveal — scramble text effect
+      // Label reveal — simple fade in
       if (label) {
-        scrambleReveal(label as HTMLElement, 200);
+        animate(label, {
+          opacity: [0, 1],
+          translateY: [10, 0],
+          duration: 500,
+          easing: "easeOutExpo",
+          delay: 200,
+        });
         delay = 400;
       }
 
