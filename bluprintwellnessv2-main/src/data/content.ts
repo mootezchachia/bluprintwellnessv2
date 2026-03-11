@@ -288,7 +288,7 @@ export const aestheticsContent = {
     tagline: "Modern. Precision-Driven. Results You Can Trust.",
     title: "Next-Level Aesthetics\nIn Solana Beach",
     body: "An elevated, technology-forward aesthetics experience where advanced science, artistry, and wellness converge. This isn\u2019t just a place for treatments \u2014 it\u2019s a destination for confidence, rejuvenation, and feeling your absolute best.",
-    image: "/images/desktop/detail-4.webp",
+    image: "/images/desktop/aesthetics-hero.webp",
   },
   services: [
     {
@@ -297,7 +297,7 @@ export const aestheticsContent = {
       body: "Blends microneedling with radiofrequency energy to remodel skin at a deeper level, improving texture, firmness, and overall skin quality.",
       tag: "Deep remodeling",
       icon: "morpheus" as const,
-      image: "/images/desktop/detail-4.webp",
+      image: "/images/desktop/aesthetics-hero.webp",
     },
     {
       title: "Injectables",

@@ -13,16 +13,17 @@ export interface StepImages {
 /*
  * Transition chain: hero → sport → manifesto → brands → sphere → experimentation → focus → join → invest
  * RULE: Every adjacent pair MUST have different [0] images for visible morph transitions.
+ * RULE: Every image file is used EXACTLY ONCE across all steps.
  *
- * hero[0]           = hero.webp          (athletic torso)
- * sport[0]          = customer-1.webp    (balanced stones)
- * manifesto[0]      = customer-2.webp    (ice on skin)
- * brands[0]         = customer-1.webp    (athletic man — slide 1 of recognition)
+ * hero[0]           = hero.webp          (gym interior)
+ * sport[0]          = customer-1.webp    (person photo)
+ * manifesto[0]      = customer-2.webp    (aesthetician portrait)
+ * brands[0]         = brands-1.webp      (Bluprint reception)
  * sphere[0]         = join.webp          (Bluprint lobby — The Studio)
  * experimentation[0]= detail-1.webp      (personal training)
  * focus[0]          = focus-1.webp       (treadmills)
- * join[0]           = customer-3.webp    (B&W rocks)
- * invest[0]         = customer-2.webp    (ice close-up)
+ * join[0]           = join-person.webp   (wellness lifestyle)
+ * invest[0]         = invest-img.webp    (aspirational)
  */
 export const STEPS: Record<string, StepImages> = {
   hero: {
@@ -47,14 +48,14 @@ export const STEPS: Record<string, StepImages> = {
   },
   brands: {
     desktop: [
-      "/images/desktop/customer-1.webp",
-      "/images/desktop/customer-2.webp",
-      "/images/desktop/customer-3.webp",
+      "/images/desktop/brands-1.webp",
+      "/images/desktop/brands-2.webp",
+      "/images/desktop/brands-3.webp",
     ],
     mobile: [
-      "/images/mobile/customer-1.webp",
-      "/images/mobile/customer-2.webp",
-      "/images/mobile/customer-3.webp",
+      "/images/mobile/brands-1.webp",
+      "/images/mobile/brands-2.webp",
+      "/images/mobile/brands-3.webp",
     ],
   },
   sphere: {
@@ -92,12 +93,12 @@ export const STEPS: Record<string, StepImages> = {
     ],
   },
   join: {
-    desktop: ["/images/desktop/customer-3.webp"],
-    mobile: ["/images/mobile/customer-3.webp"],
+    desktop: ["/images/desktop/join-person.webp"],
+    mobile: ["/images/mobile/join-person.webp"],
   },
   invest: {
-    desktop: ["/images/desktop/customer-2.webp"],
-    mobile: ["/images/mobile/customer-2.webp"],
+    desktop: ["/images/desktop/invest-img.webp"],
+    mobile: ["/images/mobile/invest-img.webp"],
   },
   blank: {
     desktop: ["/images/desktop/hero.webp"],
@@ -172,7 +173,8 @@ export class ImageTransition {
   /*  Image Loading                                                    */
   /* ================================================================ */
 
-  /** Load a single image URL, returns cached texture or loads new one. */
+  /** Load a single image URL, returns cached texture or loads new one.
+   *  Uses createImageBitmap() to fully decode off-thread before GPU upload. */
   private loadTexture(url: string): Promise<Texture | null> {
     if (this.cache.has(url)) {
       return Promise.resolve(this.cache.get(url)!);
@@ -182,24 +184,32 @@ export class ImageTransition {
       return this.loadingPromises.get(url)!;
     }
 
-    const promise = new Promise<Texture | null>((resolve) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        const texture = new Texture(this.gl, {
-          image: img,
+    const gl = this.gl;
+    const promise = (async (): Promise<Texture | null> => {
+      try {
+        const resp = await fetch(url);
+        const blob = await resp.blob();
+        const bitmap = await createImageBitmap(blob, {
+          premultiplyAlpha: "none",
+          colorSpaceConversion: "none",
+          imageOrientation: "flipY",
+        });
+        const texture = new Texture(gl, {
+          image: bitmap as unknown as HTMLImageElement,
+          width: bitmap.width,
+          height: bitmap.height,
           generateMipmaps: false,
+          minFilter: gl.LINEAR,
+          magFilter: gl.LINEAR,
         });
         this.cache.set(url, texture);
+        return texture;
+      } catch {
+        return null;
+      } finally {
         this.loadingPromises.delete(url);
-        resolve(texture);
-      };
-      img.onerror = () => {
-        this.loadingPromises.delete(url);
-        resolve(null);
-      };
-      img.src = url;
-    });
+      }
+    })();
 
     this.loadingPromises.set(url, promise);
     return promise;
@@ -297,6 +307,13 @@ export class ImageTransition {
       if (tex !== this.fallbackTexture) {
         this.textureB = tex;
         this.imageResB = this.getTextureRes(tex);
+      } else {
+        // Texture not yet loaded — use textureA as stand-in for B
+        // so the morph blends A→A (no visual corruption) until B arrives
+        this.textureB = this.textureA;
+        this.imageResB = [...this.imageResA] as [number, number];
+        // Kick off the load so next progress event picks it up
+        this.loadTexture(toUrl);
       }
     }
 
@@ -410,6 +427,12 @@ export class ImageTransition {
 
     this.currentStepKey = key;
     this.currentSlideIndex = 0;
+
+    // Eagerly preload the next step so textures are ready before scroll reaches it
+    const idx = STEP_ORDER.indexOf(key);
+    if (idx >= 0 && idx < STEP_ORDER.length - 1) {
+      this.preloadStep(STEP_ORDER[idx + 1]);
+    }
 
     // Only load textures on cold start (no visible image yet).
     // During scroll transitions, sectionTransition morphs handle the visual change
