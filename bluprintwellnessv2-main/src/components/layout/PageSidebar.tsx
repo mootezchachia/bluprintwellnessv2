@@ -9,13 +9,12 @@ interface PageSidebarProps {
 }
 
 const pages = [
-  { href: "/functional-medicine", label: "Functional Medicine", description: "Root-cause analysis & interventions" },
-  { href: "/aesthetics", label: "Aesthetics", description: "Precision treatments by Suzanne Dean, RN" },
-  { href: "/apply", label: "Apply for Membership", description: "Begin your wellness journey" },
+  { href: "/functional-medicine", label: "Functional\nMedicine", description: "Root-cause analysis & interventions" },
+  { href: "/aesthetics", label: "Precision\nAesthetics", description: "Advanced treatments by Suzanne Dean, RN" },
+  { href: "/apply", label: "Apply for\nMembership", description: "Begin your wellness journey" },
 ];
 
 export default function PageSidebar({ isOpen, onClose }: PageSidebarProps) {
-  // Close on Escape
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -24,7 +23,6 @@ export default function PageSidebar({ isOpen, onClose }: PageSidebarProps) {
     return () => window.removeEventListener("keydown", handleKey);
   }, [isOpen, onClose]);
 
-  // Prevent body scroll when open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -36,22 +34,26 @@ export default function PageSidebar({ isOpen, onClose }: PageSidebarProps) {
 
   return (
     <>
-      {/* Backdrop */}
       <div
         className={`pageSidebar_backdrop ${isOpen ? "pageSidebar_backdrop--open" : ""}`}
         onClick={onClose}
       />
 
-      {/* Sidebar panel */}
       <div className={`pageSidebar ${isOpen ? "pageSidebar--open" : ""}`}>
+        {/* Warm ambient glow — matches hero/CTA glow pattern */}
+        <div className="pageSidebar_glow" />
+
         <div className="pageSidebar_header">
           <span className="pageSidebar_label">Explore</span>
-          <button type="button" className="pageSidebar_close" aria-label="Close sidebar" onClick={onClose}>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M1 1l12 12M13 1L1 13" />
+          <button type="button" className="pageSidebar_close" aria-label="Close" onClick={onClose}>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.2">
+              <path d="M1 1l10 10M11 1L1 11" />
             </svg>
           </button>
         </div>
+
+        {/* Gradient divider — same pattern as section dividers */}
+        <div className="pageSidebar_divider" />
 
         <nav className="pageSidebar_nav">
           {pages.map((page, i) => (
@@ -60,24 +62,34 @@ export default function PageSidebar({ isOpen, onClose }: PageSidebarProps) {
               href={page.href}
               className="pageSidebar_link"
               onClick={onClose}
-              style={{ transitionDelay: isOpen ? `${80 + i * 50}ms` : "0ms" }}
+              style={{ transitionDelay: isOpen ? `${120 + i * 70}ms` : "0ms" }}
             >
               <span className="pageSidebar_link_num">.0{i + 1}</span>
               <div className="pageSidebar_link_text">
-                <span className="pageSidebar_link_title">{page.label}</span>
+                <span className="pageSidebar_link_title">
+                  {page.label.split("\n").map((line, j) => (
+                    <span key={j} style={{ display: "block" }}>{line}</span>
+                  ))}
+                </span>
                 <span className="pageSidebar_link_desc">{page.description}</span>
               </div>
-              <svg className="pageSidebar_link_arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.2">
-                <path d="M3 8h10M9 4l4 4-4 4" />
+              <svg className="pageSidebar_link_arrow" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1">
+                <path d="M4 10h12M12 6l4 4-4 4" />
               </svg>
             </Link>
           ))}
         </nav>
 
+        <div className="pageSidebar_divider" />
+
         <div className="pageSidebar_footer">
+          <span className="pageSidebar_footer_label">Contact</span>
           <a href="mailto:jonathan@bluprintwellness.com" className="pageSidebar_email">
             jonathan@bluprintwellness.com
           </a>
+          <span className="pageSidebar_footer_address">
+            137 Lomas Santa Fe Drive, Solana Beach
+          </span>
         </div>
       </div>
     </>

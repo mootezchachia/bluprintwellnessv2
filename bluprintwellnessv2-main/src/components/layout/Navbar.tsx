@@ -86,10 +86,12 @@ export default function Navbar({ onMenuToggle }: NavbarProps) {
           <button
             type="button"
             className="navbar_sidebarToggle"
-            aria-label="Open pages"
+            aria-label="Explore pages"
             onClick={() => setSidebarOpen(true)}
           >
-            <span /><span /><span />
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 0l1.8 6.2L16 8l-6.2 1.8L8 16l-1.8-6.2L0 8l6.2-1.8z" />
+            </svg>
           </button>
         </div>
 
