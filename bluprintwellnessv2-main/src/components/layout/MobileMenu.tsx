@@ -1,10 +1,17 @@
 "use client";
 
 import { useCallback, useEffect } from "react";
+import Link from "next/link";
 import { useLenis } from "@/hooks/useLenis";
 import { menuContent } from "@/data/content";
 import Button from "@/components/ui/Button";
 import AmbientSound from "@/components/decorative/AmbientSound";
+
+const pageRoutes = [
+  { href: "/functional-medicine", label: "Functional Medicine" },
+  { href: "/aesthetics", label: "Precision Aesthetics" },
+  { href: "/apply", label: "Apply for Membership" },
+];
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -64,6 +71,23 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             ))}
           </ul>
         </nav>
+
+        <div className="menu_pages">
+          <div className="menu_pages_divider" />
+          <span className="menu_pages_label">Explore</span>
+          <ul>
+            {pageRoutes.map((page) => (
+              <li key={page.href}>
+                <Link href={page.href} onClick={onClose}>
+                  {page.label}
+                  <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.2">
+                    <path d="M4 10h12M12 6l4 4-4 4" />
+                  </svg>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
 
         <div className="menu_actions">
           <Button scrollTo="contact" onClick={onClose} dataSplitLabel="char">Contact</Button>
