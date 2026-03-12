@@ -133,8 +133,8 @@ export class ImageTransition {
   public imageMix = 0; // 0 = black, 1 = show images
 
   /* ----- shader parameters ----- */
-  public strength = 0.1;
-  public lateral = 0.5;
+  public strength = 0.015;
+  public lateral = 0.03;
   public distort = 0.003;
   public intensity = 0.1;
   public color: [number, number, number] = [0.125, 0.125, 0.125]; // #202020
