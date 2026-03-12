@@ -38,6 +38,11 @@ const AmbientSound = forwardRef<AmbientSoundRef>(function AmbientSound(_, ref) {
   const toggleAudio = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
+    // First click also serves as user activation — unlock audio context
+    if (!canPlayRef.current) {
+      canPlayRef.current = true;
+      toggleRef.current?.classList.add("ready");
+    }
     if (isPlaying()) {
       audio.pause();
       toggleRef.current?.classList.remove("playing");
@@ -66,22 +71,52 @@ const AmbientSound = forwardRef<AmbientSoundRef>(function AmbientSound(_, ref) {
       this.play();
     });
 
-    // Set ready on first user interaction
-    const setReady = () => {
+    // Try to autoplay immediately
+    const attemptAutoplay = () => {
       if (canPlayRef.current) return;
+      audio.play().then(() => {
+        // Autoplay succeeded
+        canPlayRef.current = true;
+        toggleRef.current?.classList.add("ready", "playing");
+        removeInteractionListeners();
+      }).catch(() => {
+        // Autoplay blocked — will play on first interaction
+      });
+    };
+
+    // Fallback: play on first user gesture (wheel/pointerdown/touchstart/keydown)
+    // Note: "scroll" is NOT a user activation event — browsers won't unlock audio.
+    // "wheel" and "pointerdown" ARE user activations and fire on first scroll gesture.
+    const onInteraction = (e: Event) => {
+      if (canPlayRef.current) return;
+      // Skip if the gesture is on the Sound button — let toggleAudio handle it
+      if (toggleRef.current?.contains(e.target as Node)) return;
       canPlayRef.current = true;
       toggleRef.current?.classList.add("ready");
-      if (startRequestedRef.current) tryPlay();
-      window.removeEventListener("click", setReady);
-      window.removeEventListener("touchstart", setReady);
+      tryPlay();
+      removeInteractionListeners();
     };
-    window.addEventListener("click", setReady);
-    window.addEventListener("touchstart", setReady);
+
+    const removeInteractionListeners = () => {
+      window.removeEventListener("wheel", onInteraction);
+      window.removeEventListener("pointerdown", onInteraction);
+      window.removeEventListener("touchstart", onInteraction);
+      window.removeEventListener("keydown", onInteraction);
+    };
+
+    window.addEventListener("wheel", onInteraction, { passive: true });
+    window.addEventListener("pointerdown", onInteraction);
+    window.addEventListener("touchstart", onInteraction);
+    window.addEventListener("keydown", onInteraction);
+
+    // Attempt autoplay after a short delay (lets browser settle)
+    const autoplayTimer = setTimeout(attemptAutoplay, 300);
 
     // Listen for start event from loading sequence
     const handleStart = () => {
       startRequestedRef.current = true;
       if (canPlayRef.current) tryPlay();
+      else attemptAutoplay();
     };
     window.addEventListener("ambientSound:start", handleStart);
 
@@ -112,11 +147,11 @@ const AmbientSound = forwardRef<AmbientSoundRef>(function AmbientSound(_, ref) {
     }
 
     return () => {
+      clearTimeout(autoplayTimer);
       cancelAnimationFrame(animFrameRef.current);
       audio.pause();
       audio.src = "";
-      window.removeEventListener("click", setReady);
-      window.removeEventListener("touchstart", setReady);
+      removeInteractionListeners();
       window.removeEventListener("ambientSound:start", handleStart);
     };
   }, [tryPlay]);
