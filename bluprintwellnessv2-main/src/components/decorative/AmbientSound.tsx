@@ -10,8 +10,8 @@ const AmbientSound = forwardRef<AmbientSoundRef>(function AmbientSound(_, ref) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
-  const canPlayRef = useRef(false);
-  const startRequestedRef = useRef(false);
+  const unlockedRef = useRef(false);
+  const userPausedRef = useRef(false); // true when user explicitly clicked Sound to pause
   const animFrameRef = useRef<number>(0);
 
   // Wave animation state
@@ -28,25 +28,43 @@ const AmbientSound = forwardRef<AmbientSoundRef>(function AmbientSound(_, ref) {
     return audio ? audio.duration > 0 && !audio.paused : false;
   }, []);
 
-  const tryPlay = useCallback(() => {
+  /** Unlock and play (only if user hasn't explicitly paused). */
+  const unlockAndPlay = useCallback(() => {
+    if (unlockedRef.current) return;
     const audio = audioRef.current;
-    if (!audio || !canPlayRef.current) return;
-    audio.play().catch(() => {});
-    toggleRef.current?.classList.add("playing");
+    if (!audio) return;
+
+    unlockedRef.current = true;
+    toggleRef.current?.classList.add("ready");
+
+    // Only auto-start if user hasn't manually paused
+    if (!userPausedRef.current) {
+      audio.play().then(() => {
+        toggleRef.current?.classList.add("playing");
+      }).catch(() => {
+        // Still blocked — will retry on next interaction
+        unlockedRef.current = false;
+      });
+    }
   }, []);
 
+  /** Toggle: user explicitly controls sound on/off. */
   const toggleAudio = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    // First click also serves as user activation — unlock audio context
-    if (!canPlayRef.current) {
-      canPlayRef.current = true;
+
+    // First click also serves as user activation
+    if (!unlockedRef.current) {
+      unlockedRef.current = true;
       toggleRef.current?.classList.add("ready");
     }
+
     if (isPlaying()) {
       audio.pause();
+      userPausedRef.current = true;
       toggleRef.current?.classList.remove("playing");
     } else {
+      userPausedRef.current = false;
       audio.play().catch(() => {});
       toggleRef.current?.classList.add("playing");
     }
@@ -54,11 +72,8 @@ const AmbientSound = forwardRef<AmbientSoundRef>(function AmbientSound(_, ref) {
 
   // Expose start method for loading sequence
   useImperativeHandle(ref, () => ({
-    start: () => {
-      startRequestedRef.current = true;
-      if (canPlayRef.current) tryPlay();
-    },
-  }), [tryPlay]);
+    start: () => unlockAndPlay(),
+  }), [unlockAndPlay]);
 
   useEffect(() => {
     // Create audio element
@@ -71,53 +86,38 @@ const AmbientSound = forwardRef<AmbientSoundRef>(function AmbientSound(_, ref) {
       this.play();
     });
 
-    // Try to autoplay immediately
-    const attemptAutoplay = () => {
-      if (canPlayRef.current) return;
-      audio.play().then(() => {
-        // Autoplay succeeded
-        canPlayRef.current = true;
-        toggleRef.current?.classList.add("ready", "playing");
-        removeInteractionListeners();
-      }).catch(() => {
-        // Autoplay blocked — will play on first interaction
-      });
-    };
-
-    // Fallback: play on first user gesture (wheel/pointerdown/touchstart/keydown)
-    // Note: "scroll" is NOT a user activation event — browsers won't unlock audio.
-    // "wheel" and "pointerdown" ARE user activations and fire on first scroll gesture.
-    const onInteraction = (e: Event) => {
-      if (canPlayRef.current) return;
-      // Skip if the gesture is on the Sound button — let toggleAudio handle it
+    // ---- User activation listeners ----
+    // Browsers ONLY unlock audio on real user activation events:
+    // click, mousedown, pointerdown, pointerup, touchstart, touchend, keydown, keyup
+    // scroll and wheel are NOT user activations.
+    // On mobile, touchstart fires on first scroll gesture → sound starts on first scroll.
+    // On desktop, first click/keypress triggers it.
+    const onUserActivation = (e: Event) => {
+      if (unlockedRef.current) return;
+      // Skip if clicking the Sound button — toggleAudio handles it
       if (toggleRef.current?.contains(e.target as Node)) return;
-      canPlayRef.current = true;
-      toggleRef.current?.classList.add("ready");
-      tryPlay();
-      removeInteractionListeners();
+      unlockAndPlay();
+      removeListeners();
     };
 
-    const removeInteractionListeners = () => {
-      window.removeEventListener("wheel", onInteraction);
-      window.removeEventListener("pointerdown", onInteraction);
-      window.removeEventListener("touchstart", onInteraction);
-      window.removeEventListener("keydown", onInteraction);
+    const events = ["click", "mousedown", "pointerdown", "touchstart", "keydown"] as const;
+    const removeListeners = () => {
+      events.forEach(evt => window.removeEventListener(evt, onUserActivation));
     };
+    events.forEach(evt => window.addEventListener(evt, onUserActivation, { once: false, passive: true }));
 
-    window.addEventListener("wheel", onInteraction, { passive: true });
-    window.addEventListener("pointerdown", onInteraction);
-    window.addEventListener("touchstart", onInteraction);
-    window.addEventListener("keydown", onInteraction);
-
-    // Attempt autoplay after a short delay (lets browser settle)
-    const autoplayTimer = setTimeout(attemptAutoplay, 300);
+    // Also try autoplay immediately (works if site has high Media Engagement Index)
+    const autoplayTimer = setTimeout(() => {
+      if (unlockedRef.current) return;
+      audio.play().then(() => {
+        unlockedRef.current = true;
+        toggleRef.current?.classList.add("ready", "playing");
+        removeListeners();
+      }).catch(() => { /* blocked, waiting for user gesture */ });
+    }, 500);
 
     // Listen for start event from loading sequence
-    const handleStart = () => {
-      startRequestedRef.current = true;
-      if (canPlayRef.current) tryPlay();
-      else attemptAutoplay();
-    };
+    const handleStart = () => unlockAndPlay();
     window.addEventListener("ambientSound:start", handleStart);
 
     // Draw procedural sine waveform
@@ -151,10 +151,10 @@ const AmbientSound = forwardRef<AmbientSoundRef>(function AmbientSound(_, ref) {
       cancelAnimationFrame(animFrameRef.current);
       audio.pause();
       audio.src = "";
-      removeInteractionListeners();
+      removeListeners();
       window.removeEventListener("ambientSound:start", handleStart);
     };
-  }, [tryPlay]);
+  }, [unlockAndPlay]);
 
   return (
     <button ref={toggleRef} type="button" className="ambient" onClick={toggleAudio}>
