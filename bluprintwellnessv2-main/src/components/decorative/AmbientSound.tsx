@@ -10,8 +10,8 @@ const AmbientSound = forwardRef<AmbientSoundRef>(function AmbientSound(_, ref) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
-  const unlockedRef = useRef(false);
-  const userPausedRef = useRef(false); // true when user explicitly clicked Sound to pause
+  const unmutedRef = useRef(false);   // true once we've unmuted after user gesture
+  const userPausedRef = useRef(false); // true when user explicitly clicked Sound to mute
   const animFrameRef = useRef<number>(0);
 
   // Wave animation state
@@ -23,29 +23,20 @@ const AmbientSound = forwardRef<AmbientSoundRef>(function AmbientSound(_, ref) {
     increment: Math.random() * 360,
   });
 
-  const isPlaying = useCallback(() => {
+  const isAudible = useCallback(() => {
     const audio = audioRef.current;
-    return audio ? audio.duration > 0 && !audio.paused : false;
+    return audio ? !audio.paused && !audio.muted : false;
   }, []);
 
-  /** Unlock and play (only if user hasn't explicitly paused). */
-  const unlockAndPlay = useCallback(() => {
-    if (unlockedRef.current) return;
+  /** Unmute the already-playing audio on first user gesture. */
+  const unmute = useCallback(() => {
+    if (unmutedRef.current || userPausedRef.current) return;
     const audio = audioRef.current;
     if (!audio) return;
 
-    unlockedRef.current = true;
-    toggleRef.current?.classList.add("ready");
-
-    // Only auto-start if user hasn't manually paused
-    if (!userPausedRef.current) {
-      audio.play().then(() => {
-        toggleRef.current?.classList.add("playing");
-      }).catch(() => {
-        // Still blocked — will retry on next interaction
-        unlockedRef.current = false;
-      });
-    }
+    unmutedRef.current = true;
+    audio.muted = false;
+    toggleRef.current?.classList.add("ready", "playing");
   }, []);
 
   /** Toggle: user explicitly controls sound on/off. */
@@ -53,72 +44,84 @@ const AmbientSound = forwardRef<AmbientSoundRef>(function AmbientSound(_, ref) {
     const audio = audioRef.current;
     if (!audio) return;
 
-    // First click also serves as user activation
-    if (!unlockedRef.current) {
-      unlockedRef.current = true;
-      toggleRef.current?.classList.add("ready");
-    }
-
-    if (isPlaying()) {
-      audio.pause();
+    if (isAudible()) {
+      // User wants to mute
+      audio.muted = true;
       userPausedRef.current = true;
+      unmutedRef.current = false;
       toggleRef.current?.classList.remove("playing");
     } else {
+      // User wants to unmute
       userPausedRef.current = false;
-      audio.play().catch(() => {});
+      unmutedRef.current = true;
+      audio.muted = false;
+      // If audio somehow got paused, restart it
+      if (audio.paused) audio.play().catch(() => {});
       toggleRef.current?.classList.add("playing");
     }
-  }, [isPlaying]);
+  }, [isAudible]);
 
   // Expose start method for loading sequence
   useImperativeHandle(ref, () => ({
-    start: () => unlockAndPlay(),
-  }), [unlockAndPlay]);
+    start: () => unmute(),
+  }), [unmute]);
 
   useEffect(() => {
-    // Create audio element
+    // ---- Core trick: muted autoplay is ALWAYS allowed by all browsers ----
+    // We start the audio muted so it begins playing immediately on page load.
+    // Then on first user interaction we unmute it — instant sound, no delay.
     const audio = new Audio("/sounds/ambience.mp3");
+    audio.muted = true;
+    audio.loop = true;
     audioRef.current = audio;
 
-    // Manual loop via ended event
-    audio.addEventListener("ended", function () {
-      this.currentTime = 0;
-      this.play();
-    });
+    // Start playing immediately (muted — always allowed)
+    audio.play().catch(() => {});
 
-    // ---- User activation listeners ----
-    // Browsers ONLY unlock audio on real user activation events:
-    // click, mousedown, pointerdown, pointerup, touchstart, touchend, keydown, keyup
-    // scroll and wheel are NOT user activations.
-    // On mobile, touchstart fires on first scroll gesture → sound starts on first scroll.
-    // On desktop, first click/keypress triggers it.
-    const onUserActivation = (e: Event) => {
-      if (unlockedRef.current) return;
-      // Skip if clicking the Sound button — toggleAudio handles it
+    // ---- Unmute on first user gesture ----
+    // These are all real "user activation" events that browsers recognize.
+    // On mobile, touchstart fires on first scroll gesture → instant unmute.
+    // On desktop, first click or keypress → instant unmute.
+    const onUserGesture = (e: Event) => {
+      if (unmutedRef.current || userPausedRef.current) return;
+      // Skip Sound button — toggleAudio handles it
       if (toggleRef.current?.contains(e.target as Node)) return;
-      unlockAndPlay();
+      unmute();
       removeListeners();
     };
 
-    const events = ["click", "mousedown", "pointerdown", "touchstart", "keydown"] as const;
+    const gestureEvents = ["click", "mousedown", "pointerdown", "touchstart", "keydown"] as const;
     const removeListeners = () => {
-      events.forEach(evt => window.removeEventListener(evt, onUserActivation));
+      gestureEvents.forEach(evt => window.removeEventListener(evt, onUserGesture));
     };
-    events.forEach(evt => window.addEventListener(evt, onUserActivation, { once: false, passive: true }));
+    gestureEvents.forEach(evt =>
+      window.addEventListener(evt, onUserGesture, { passive: true })
+    );
 
-    // Also try autoplay immediately (works if site has high Media Engagement Index)
-    const autoplayTimer = setTimeout(() => {
-      if (unlockedRef.current) return;
-      audio.play().then(() => {
-        unlockedRef.current = true;
-        toggleRef.current?.classList.add("ready", "playing");
-        removeListeners();
-      }).catch(() => { /* blocked, waiting for user gesture */ });
-    }, 500);
-
-    // Listen for start event from loading sequence
-    const handleStart = () => unlockAndPlay();
+    // Also listen for loading sequence completion
+    const handleStart = () => {
+      // Can't unmute here (no user gesture), but mark ready
+      toggleRef.current?.classList.add("ready");
+    };
     window.addEventListener("ambientSound:start", handleStart);
+
+    // Also attempt full unmuted autoplay (works on high-MEI sites)
+    const autoplayTimer = setTimeout(() => {
+      if (unmutedRef.current) return;
+      audio.muted = false;
+      // If browser re-pauses, go back to muted
+      setTimeout(() => {
+        if (audio.paused && !userPausedRef.current) {
+          audio.muted = true;
+          audio.play().catch(() => {});
+        } else if (!audio.paused && !audio.muted) {
+          // Unmuted autoplay worked!
+          unmutedRef.current = true;
+          toggleRef.current?.classList.add("ready", "playing");
+          removeListeners();
+        }
+      }, 100);
+    }, 800);
 
     // Draw procedural sine waveform
     const canvas = canvasRef.current;
@@ -154,7 +157,7 @@ const AmbientSound = forwardRef<AmbientSoundRef>(function AmbientSound(_, ref) {
       removeListeners();
       window.removeEventListener("ambientSound:start", handleStart);
     };
-  }, [unlockAndPlay]);
+  }, [unmute]);
 
   return (
     <button ref={toggleRef} type="button" className="ambient" onClick={toggleAudio}>
