@@ -1652,7 +1652,9 @@ button,
   z-index: 1;
   padding: 20px 0;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
   cursor: pointer;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
@@ -1660,12 +1662,9 @@ button,
 .collapse_title_num {
   font-weight: 790;
   font-size: 0.8571428571rem;
-  margin-right: 15px;
-  min-width: 30px;
 }
 
 .collapse_title_txt {
-  flex: 1;
   font-weight: 380;
   text-transform: uppercase;
 }
