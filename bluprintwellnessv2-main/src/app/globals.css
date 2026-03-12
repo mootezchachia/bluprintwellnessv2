@@ -1651,17 +1651,12 @@ button,
   position: relative;
   z-index: 1;
   padding: 20px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
   cursor: pointer;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .collapse_title_num {
-  font-weight: 790;
-  font-size: 0.8571428571rem;
+  display: none;
 }
 
 .collapse_title_txt {
