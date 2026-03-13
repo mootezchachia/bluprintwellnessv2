@@ -3824,3 +3824,571 @@ html.custom-cursor * {
     justify-content: center;
   }
 }
+
+/* ═══════════════════════════════════════════
+   JONATHAN UPHOFF — FOUNDER PAGE
+   ═══════════════════════════════════════════ */
+
+.jonathanPage {
+  position: relative;
+  z-index: 1;
+  background: #000;
+}
+
+/* ── Nav ── */
+.jonathan_nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 24px 40px;
+  z-index: 50;
+  mix-blend-mode: difference;
+}
+.jonathan_back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.857rem;
+  opacity: 0.6;
+  transition: opacity 0.3s var(--ease-smooth);
+  cursor: pointer;
+}
+.jonathan_back:hover {
+  opacity: 1;
+}
+
+/* ── Hero — editorial split ── */
+.pSection--jonathanHero {
+  position: relative;
+  overflow: hidden;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  padding: 140px 0 100px;
+}
+.jonathan_heroGlow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 40% 50% at 75% 50%, rgba(255, 255, 255, 0.045) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 20% 70%, rgba(200, 220, 255, 0.025) 0%, transparent 60%);
+}
+.jonathan_heroGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(48px, 6vw, 100px);
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+.jonathan_heroText {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.jonathan_heroLabel {
+  margin-bottom: 20px;
+  display: block;
+}
+.jonathan_heroName {
+  font-size: clamp(52px, 7vw, 120px);
+  font-weight: 230;
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  margin-bottom: 0;
+}
+.jonathan_heroLine {
+  width: 56px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.25);
+  margin: 28px 0;
+}
+.jonathan_heroTitle {
+  font-size: clamp(0.929rem, 1.2vw, 1.143rem);
+  font-weight: 420;
+  opacity: 0.45;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 40px;
+}
+.jonathan_heroActions {
+  margin-top: 0;
+}
+.jonathan_heroPortrait {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 3/4;
+  max-height: 75vh;
+}
+.jonathan_heroPortrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 15%;
+  filter: grayscale(0.25) contrast(1.08);
+  transition: filter 1.4s var(--ease-smooth), transform 1.8s cubic-bezier(0.19, 1, 0.22, 1);
+}
+.jonathan_heroPortrait:hover img {
+  filter: grayscale(0) contrast(1.02);
+  transform: scale(1.03);
+}
+.jonathan_heroPortrait::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+  z-index: 2;
+}
+.jonathan_heroPortrait::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 60%, rgba(0, 0, 0, 0.35) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Stats Ribbon ── */
+.jonathan_stats {
+  padding: 88px 0;
+  position: relative;
+}
+.jonathan_stats::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 6.25vw;
+  right: 6.25vw;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.10) 20%, rgba(255, 255, 255, 0.10) 80%, transparent 100%);
+}
+.jonathan_stats::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 6.25vw;
+  right: 6.25vw;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.10) 20%, rgba(255, 255, 255, 0.10) 80%, transparent 100%);
+}
+.jonathan_statsInner {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+}
+.jonathan_stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 clamp(40px, 6vw, 100px);
+  position: relative;
+}
+.jonathan_stat:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 50%;
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+}
+.jonathan_stat_value {
+  font-size: clamp(44px, 5.5vw, 72px);
+  font-weight: 220;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin-bottom: 14px;
+}
+.jonathan_stat_label {
+  font-size: 0.786rem;
+  font-weight: 420;
+  opacity: 0.4;
+  line-height: 1.5;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── Section dividers ── */
+.jonathan_divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 5%, rgba(255, 255, 255, 0.08) 30%, rgba(255, 255, 255, 0.08) 70%, transparent 95%);
+  margin: 0 6.25vw;
+}
+
+/* ── Bio — word reveal ── */
+.pSection--jonathanBio {
+  background: radial-gradient(ellipse 80% 60% at 20% 40%, rgba(255, 255, 255, 0.035) 0%, transparent 70%);
+}
+.jonathan_bioContent {
+  min-height: 200svh;
+}
+.jonathan_bioProgress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  pointer-events: none;
+}
+.jonathan_bioLayout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 100px;
+  align-items: start;
+}
+.jonathan_bioSide {
+  position: sticky;
+  top: 38%;
+}
+.jonathan_bioSideTitle {
+  font-size: clamp(32px, 3.5vw, 52px);
+  font-weight: 260;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  margin-top: 12px;
+}
+.jonathan_bioSideLine {
+  width: 40px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  margin-top: 24px;
+}
+.jonathan_bioManifesto {
+  font-size: clamp(1.286rem, 1.8vw, 1.643rem);
+  line-height: 1.9;
+  font-weight: 340;
+  padding-top: 40px;
+  max-width: 680px;
+}
+.jonathan_bioManifesto .word {
+  display: inline;
+  opacity: 0.15;
+  filter: blur(5px);
+  transition: opacity 0.3s ease-out, filter 0.4s ease-out;
+}
+.jonathan_bioManifesto .word.active {
+  opacity: 1;
+  filter: blur(0);
+}
+
+/* ── Philosophy ── */
+.pSection--jonathanPhilosophy,
+.pSection--jonathanCredentials,
+.pSection--jonathanCta {
+  min-height: auto;
+}
+.pSection--jonathanPhilosophy .pSection_sub,
+.pSection--jonathanCredentials .pSection_sub,
+.pSection--jonathanCta .pSection_sub {
+  min-height: auto;
+}
+.pSection--jonathanPhilosophy .pSection_sticky,
+.pSection--jonathanCredentials .pSection_sticky,
+.pSection--jonathanCta .pSection_sticky {
+  position: relative;
+  min-height: auto;
+  padding-top: 120px;
+  padding-bottom: 120px;
+}
+.pSection--jonathanPhilosophy {
+  background: radial-gradient(ellipse 70% 50% at 80% 30%, rgba(200, 210, 235, 0.03) 0%, transparent 60%);
+}
+.jonathan_philosophyLayout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 100px;
+  align-items: start;
+}
+.jonathan_philosophyQuote {
+  position: relative;
+  padding-left: 32px;
+  padding-top: 12px;
+}
+.jonathan_philosophyAccent {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.04) 100%);
+  border-radius: 1px;
+}
+.jonathan_philosophyMark {
+  font-size: clamp(72px, 8vw, 120px);
+  font-weight: 200;
+  line-height: 0.5;
+  opacity: 0.08;
+  position: absolute;
+  left: 16px;
+  top: -8px;
+  pointer-events: none;
+}
+.jonathan_philosophyBlockquote {
+  font-size: clamp(1.429rem, 2.2vw, 2rem);
+  font-weight: 280;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+.jonathan_philosophyAttr {
+  display: block;
+  margin-top: 28px;
+  font-size: 0.857rem;
+  font-weight: 420;
+  opacity: 0.35;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.jonathan_philosophyBody {
+  padding-top: 8px;
+}
+.jonathan_philosophyBody p {
+  font-size: 1.071rem;
+  line-height: 1.8;
+  opacity: 0.55;
+  font-weight: 360;
+}
+
+/* ── Credentials ── */
+.pSection--jonathanCredentials {
+  background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(220, 225, 240, 0.035) 0%, transparent 70%);
+}
+.jonathan_credentialsHeader {
+  margin-bottom: 64px;
+}
+.jonathan_credentialsTitle {
+  margin-top: 12px;
+}
+.jonathan_credentials {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(20px, 2vw, 32px);
+}
+.jonathan_credential {
+  padding: 40px 44px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.5s var(--ease-smooth), border-color 0.5s var(--ease-smooth), transform 0.6s var(--ease-smooth), box-shadow 0.6s var(--ease-smooth);
+}
+.jonathan_credential::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  opacity: 0.7;
+  transition: opacity 0.4s var(--ease-smooth);
+}
+.jonathan_credential:hover {
+  background: rgba(255, 255, 255, 0.045);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+}
+.jonathan_credential:hover::before {
+  opacity: 1;
+}
+.jonathan_credential_num {
+  font-size: 0.786rem;
+  opacity: 0.3;
+  margin-bottom: 18px;
+  letter-spacing: 0.04em;
+}
+.jonathan_credential_title {
+  font-size: 1.286rem;
+  font-weight: 400;
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+.jonathan_credential_body {
+  font-size: 0.929rem;
+  line-height: 1.7;
+  opacity: 0.5;
+  font-weight: 370;
+}
+
+/* ── CTA ── */
+.pSection--jonathanCta {
+  position: relative;
+  overflow: hidden;
+}
+.jonathan_ctaGlow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(ellipse 55% 65% at 50% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+}
+.jonathan_ctaInner {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.jonathan_ctaTitle {
+  margin-top: 8px;
+}
+.jonathan_ctaBody {
+  font-size: 1.071rem;
+  line-height: 1.7;
+  opacity: 0.55;
+  margin-bottom: 8px;
+  font-weight: 360;
+}
+
+/* ── Footer ── */
+.jonathan_footer {
+  padding: 48px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.jonathan_footerLink {
+  font-size: 0.929rem;
+  opacity: 0.4;
+  transition: opacity 0.3s var(--ease-smooth);
+  cursor: pointer;
+}
+.jonathan_footerLink:hover {
+  opacity: 1;
+}
+
+/* ── Focus-visible ── */
+.jonathanPage :focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.jonathanPage a:focus-visible,
+.jonathanPage button:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 3px;
+}
+
+/* ── Responsive — tablet ── */
+@media (max-width: 979px) {
+  .jonathan_heroGrid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+  .jonathan_heroPortrait {
+    max-height: 60vh;
+    max-width: 480px;
+  }
+  .jonathan_bioLayout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .jonathan_bioSide {
+    position: static;
+  }
+  .jonathan_bioSideLine {
+    display: none;
+  }
+  .jonathan_philosophyLayout {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+  .jonathan_credentials {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Responsive — mobile ── */
+@media (max-width: 767px) {
+  .pSection--jonathanHero {
+    min-height: auto;
+    padding: 100px 0 64px;
+  }
+  .jonathan_heroGrid {
+    gap: 36px;
+  }
+  .jonathan_heroPortrait {
+    max-width: 100%;
+    max-height: 50vh;
+  }
+  .jonathan_heroLine {
+    width: 40px;
+    margin: 20px 0;
+  }
+  .jonathan_heroTitle {
+    margin-bottom: 28px;
+  }
+  .jonathan_stats {
+    padding: 56px 0;
+  }
+  .jonathan_stats::before,
+  .jonathan_stats::after {
+    left: 20px;
+    right: 20px;
+  }
+  .jonathan_statsInner {
+    flex-direction: column;
+    align-items: center;
+    gap: 36px;
+  }
+  .jonathan_stat:not(:last-child)::after {
+    display: none;
+  }
+  .jonathan_stat {
+    padding: 0;
+  }
+  .jonathan_nav {
+    padding: 16px 20px;
+  }
+  .jonathan_back {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 8px;
+  }
+  .jonathan_divider {
+    margin: 0 20px;
+  }
+  .jonathan_credential {
+    padding: 28px 24px;
+  }
+  .pSection--jonathanPhilosophy .pSection_sticky,
+  .pSection--jonathanCredentials .pSection_sticky,
+  .pSection--jonathanCta .pSection_sticky {
+    padding-top: 72px;
+    padding-bottom: 72px;
+  }
+  .jonathan_philosophyQuote {
+    padding-left: 24px;
+  }
+  .jonathan_ctaInner {
+    padding: 0 8px;
+  }
+  .jonathan_ctaInner .button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* ── Reduced motion ── */
+  @media (prefers-reduced-motion: reduce) {
+    .jonathan_heroPortrait img {
+      transition: none;
+    }
+    .jonathan_bioManifesto .word {
+      transition: none;
+    }
+  }
+}

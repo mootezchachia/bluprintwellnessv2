@@ -11,6 +11,7 @@ const pageRoutes = [
   { href: "/functional-medicine", label: "Functional Medicine" },
   { href: "/aesthetics", label: "Precision Aesthetics" },
   { href: "/apply", label: "Apply for Membership" },
+  { href: "/founder", label: "The Founder" },
 ];
 
 interface MobileMenuProps {

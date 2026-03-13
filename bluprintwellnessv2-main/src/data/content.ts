@@ -369,6 +369,37 @@ export const aestheticsContent = {
   },
 };
 
+export const jonathanContent = {
+  hero: {
+    name: "Jonathan\nUphoff",
+    title: "Founder & Visionary",
+    subtitle: "Bluprint Wellness",
+  },
+  stats: [
+    { value: "15+", label: "Years in Fitness\n& Wellness" },
+    { value: "3", label: "Professional\nCertifications" },
+    { value: "1", label: "Singular\nVision" },
+  ],
+  bio: "Jonathan Uphoff is an award-winning fitness entrepreneur and the visionary founder of Bluprint Wellness. With over 15 years of experience in the fitness and wellness industry, Jonathan has built a reputation for creating innovative training environments that blend cutting-edge technology with personalized coaching. His approach goes beyond traditional fitness — integrating performance training, advanced recovery, functional medicine, and aesthetics into a single, cohesive wellness destination. Every detail at Bluprint, from the Technogym Biostrength machines to the cryotherapy chambers, serves a purpose in each member's transformation journey.",
+  philosophy: {
+    quote: "I believe in the intersection of science, technology, and human potential.",
+    body: "Jonathan built Bluprint Wellness as a place where every detail serves a purpose in the member's transformation journey. From Technogym Biostrength machines to cryotherapy chambers, from functional medicine consultations to precision aesthetics — each element is intentionally chosen to create an environment where members don't just train, they transform.",
+  },
+  credentials: [
+    { title: "B.Sc. Kinesiology", body: "A deep foundation in human movement science, biomechanics, and exercise physiology." },
+    { title: "CSCS — NSCA", body: "Certified Strength and Conditioning Specialist through the National Strength and Conditioning Association." },
+    { title: "Pn1 — Precision Nutrition", body: "Level 1 Precision Nutrition certification for evidence-based nutritional coaching." },
+    { title: "FMS Certified", body: "Functional Movement Screen certified — identifying movement dysfunctions to optimize training safety and performance." },
+  ],
+  cta: {
+    label: "Begin Your Journey",
+    title: "Experience\nBluprint",
+    body: "Discover a new standard of integrated wellness — where science, technology, and personalized care converge to help you become the best version of yourself.",
+    ctaLabel: "Apply for Membership",
+    ctaHref: "/apply",
+  },
+};
+
 export const loadingImages = [
   "/images/desktop/hero.webp",
   "/images/desktop/customer-1.webp",
