@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import CookieConsentInit from "@/components/CookieConsentInit";
+
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.bluprintwellness.com"),
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   },
   manifest: "/images/favicon/site.webmanifest",
   other: {
-    "msapplication-TileColor": "#da532c",
+    "msapplication-TileColor": "#000000",
     "theme-color": "#000000",
   },
 };
@@ -43,7 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="home">
         {children}
-        <CookieConsentInit />
+
       </body>
     </html>
   );

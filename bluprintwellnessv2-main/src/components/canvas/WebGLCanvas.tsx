@@ -148,7 +148,7 @@ export default function WebGLCanvas() {
     rafRef.current = requestAnimationFrame(animate);
 
     /* ------------------------------------------------------------ */
-    /*  Pointer interaction (21TSI-style velocity tracking)          */
+    /*  Pointer interaction (velocity tracking)                      */
     /* ------------------------------------------------------------ */
     let lastPointerTime = 0;
     let lastPointerX = 0;
@@ -171,7 +171,7 @@ export default function WebGLCanvas() {
         return;
       }
 
-      // Time-based velocity (like 21TSI's flowmap)
+      // Time-based velocity for flowmap
       const now = performance.now();
       const dt = Math.max(14, now - lastPointerTime);
       lastPointerTime = now;

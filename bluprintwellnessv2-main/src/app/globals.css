@@ -1610,7 +1610,7 @@ button,
   flex-direction: column;
   height: calc(100dvh - 150px - 4vh);
   position: relative;
-  /* 21TSI-style backdrop blur for text readability */
+  /* backdrop blur for text readability */
   background: rgba(0, 0, 0, 0.3);
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
@@ -2287,7 +2287,7 @@ button,
 }
 
 /* ═══════════════════════════════════════════
-   CUSTOM CURSOR (21TSI-style)
+   CUSTOM CURSOR
    Minimal dot — the real cursor effect is
    the WebGL fluid distortion on the canvas.
    ═══════════════════════════════════════════ */
@@ -2359,6 +2359,24 @@ html.custom-cursor * {
 }
 .footer a:hover {
   opacity: 1;
+}
+.footer_routes {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+}
+.footer_routes li {
+  margin-bottom: 6px;
+}
+.footer_routes a {
+  font-weight: 300;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.footer_legal {
+  margin-top: 16px;
+  font-size: 0.857rem;
+  opacity: 0.4;
 }
 
 /* ═══════════════════════════════════════════

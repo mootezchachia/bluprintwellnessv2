@@ -3,11 +3,9 @@
 import { useEffect, useRef } from "react";
 
 /**
- * 21TSI-style custom cursor — minimal dot that follows the mouse.
- *
- * The REAL cursor effect on 21TSI is the WebGL flowmap distortion
- * (handled by FluidSimulation + output shader). This component
- * only provides the small dot indicator. Invisible on touch devices.
+ * Custom cursor — minimal dot that follows the mouse.
+ * The WebGL flowmap distortion is handled by FluidSimulation + output shader.
+ * This component only provides the small dot indicator. Invisible on touch devices.
  */
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -41,7 +39,7 @@ export default function CustomCursor() {
       cursor.style.opacity = "1";
     };
 
-    // Tight lerp for near-instant following (like 21TSI's dot)
+    // Tight lerp for near-instant following
     const tick = () => {
       pos.current.x += (target.current.x - pos.current.x) * 0.35;
       pos.current.y += (target.current.y - pos.current.y) * 0.35;
