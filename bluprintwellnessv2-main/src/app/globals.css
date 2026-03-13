@@ -2576,6 +2576,13 @@ html.custom-cursor * {
   pointer-events: none;
 }
 
+.applyWizard_error {
+  color: #f87171;
+  font-size: 0.929rem;
+  text-align: center;
+  margin-top: 16px;
+  opacity: 0.9;
+}
 .applyWizard_hint {
   position: fixed;
   bottom: 28px;

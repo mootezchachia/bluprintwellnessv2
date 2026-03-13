@@ -120,6 +120,8 @@ export default function ApplyWizard() {
   const [step, setStep] = useState(0);
   const [data, setData] = useState<FormData>(INITIAL);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   /* ---- helpers --------------------------------------------------- */
 
@@ -215,49 +217,43 @@ export default function ApplyWizard() {
     [next],
   );
 
-  const handleSubmit = useCallback(() => {
-    const subject = encodeURIComponent(
-      `Membership Application — ${data.firstName} ${data.lastName}`,
-    );
-
-    const body = encodeURIComponent(
-      [
-        `ABOUT YOU`,
-        `Name: ${data.firstName} ${data.lastName}`,
-        `Email: ${data.email}`,
-        `Phone: ${data.phone}`,
-        `How did you hear about Bluprint: ${data.hearAbout.join(", ")}`,
-        ...(data.referralName
-          ? [`Referral Name: ${data.referralName}`]
-          : []),
-        ``,
-        `LOCATION & WORK`,
-        `Current Location: ${data.location}`,
-        `Work Rhythm: ${data.workRhythm}`,
-        `About Work: ${data.aboutWork}`,
-        ``,
-        `INTERESTS`,
-        `What draws you to Bluprint: ${data.drawsYou.join(", ")}`,
-        `Most interested in: ${data.mostInterested.join(", ")}`,
-        ``,
-        `VISION`,
-        `Why become a member: ${data.whyMember}`,
-        `Investing in health means: ${data.investingHealth}`,
-        `Hoping to change: ${data.hopingToChange}`,
-        ``,
-        `FINAL DETAILS`,
-        `Begin membership: ${data.beginMembership}`,
-        `Best time to reach: ${data.bestTimeToReach}`,
-        ...(data.anythingElse
-          ? [`Anything else: ${data.anythingElse}`]
-          : []),
-        ``,
-        `Membership Agreement: Accepted`,
-      ].join("\n"),
-    );
-
-    window.location.href = `mailto:jonathan@bluprintwellness.com?subject=${subject}&body=${body}`;
-    setSubmitted(true);
+  const handleSubmit = useCallback(async () => {
+    setSubmitting(true);
+    setSubmitError("");
+    try {
+      const res = await fetch("/api/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          hearAbout: data.hearAbout,
+          referralName: data.referralName,
+          location: data.location,
+          workRhythm: data.workRhythm,
+          aboutWork: data.aboutWork,
+          drawsYou: data.drawsYou,
+          mostInterested: data.mostInterested,
+          whyMember: data.whyMember,
+          investingHealth: data.investingHealth,
+          hopingToChange: data.hopingToChange,
+          beginMembership: data.beginMembership,
+          bestTimeToReach: data.bestTimeToReach,
+          anythingElse: data.anythingElse,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Failed to send");
+      }
+      setSubmitted(true);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   }, [data]);
 
   /* ---- render helpers -------------------------------------------- */
@@ -698,8 +694,8 @@ export default function ApplyWizard() {
             <span className="applyWizard_step st4">Thank You</span>
             <h2 className="applyWizard_title">Application Sent</h2>
             <p className="applyWizard_body">
-              Your email client has been opened with your application details.
-              We&rsquo;ll be in touch soon.
+              Your application has been received. We&rsquo;ll review it and
+              be in touch soon.
             </p>
             <div className="applyWizard_actions">
               <Link href="/" className="button">
@@ -780,15 +776,20 @@ export default function ApplyWizard() {
             <button
               type="button"
               className="button"
-              disabled={!canContinue()}
+              disabled={!canContinue() || submitting}
               onClick={handleSubmit}
             >
               <span className="button_circle" />
-              <span className="button_label">Submit Application</span>
+              <span className="button_label">{submitting ? "Sending..." : "Submit Application"}</span>
               <span className="button_plus">+</span>
             </button>
           )}
         </div>
+
+        {/* Error message */}
+        {submitError && (
+          <p className="applyWizard_error">{submitError}</p>
+        )}
 
         {/* Keyboard hint */}
         {step < TOTAL_STEPS - 1 && (
