@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
 
     const { data, error } = await resend.emails.send({
       from: "Bluprint Wellness <onboarding@resend.dev>",
-      to: [process.env.APPLICATION_EMAIL || "chachiamootez@gmail.com"],
+      to: [process.env.APPLICATION_EMAIL || "jonathan@bluprintwellness.com"],
       replyTo: body.email,
       subject: `Membership Application — ${body.firstName} ${body.lastName}`,
       html: buildEmailHtml(body),
