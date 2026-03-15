@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { data, error } = await resend.emails.send({
-      from: "Bluprint Wellness <onboarding@resend.dev>",
+      from: "Bluprint Wellness <applications@bluprintwellness.com>",
       to: [process.env.APPLICATION_EMAIL || "jonathan@bluprintwellness.com"],
       replyTo: body.email,
       subject: `Membership Application — ${body.firstName} ${body.lastName}`,
