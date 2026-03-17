@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useLenis } from "@/hooks/useLenis";
 import { scrollEvents } from "@/lib/scroll-events";
 import Button from "@/components/ui/Button";
-import AmbientSound from "@/components/decorative/AmbientSound";
+
 
 interface NavbarProps {
   onMenuToggle: () => void;
@@ -80,7 +80,6 @@ export default function Navbar({ onMenuToggle }: NavbarProps) {
 
         <div className="navbar_actions">
           <Button href="/apply" dataSplitLabel="char">Apply</Button>
-          <AmbientSound />
         </div>
 
         <button type="button" className="navbar_menuToggle" aria-label="Toggle menu" onClick={onMenuToggle}>

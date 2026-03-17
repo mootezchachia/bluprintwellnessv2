@@ -94,16 +94,7 @@ export default function RecognitionSection() {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Brand overlay (shown on last slide) */}
-      <div className="recognition_brands">
-        <div className="recognition_brands_cartouche">
-          <img src="/images/brands/maddle.svg" alt="" loading="lazy" data-brand="maddle" />
-          <img src="/images/brands/mw.svg" alt="" loading="lazy" data-brand="mw" />
-          <img src="/images/brands/ascend.svg" alt="" loading="lazy" data-brand="ascend" />
-          <img src="/images/brands/nordik.svg" alt="" loading="lazy" data-brand="nordik" />
-        </div>
       </div>
 
       {/* Fade out at bottom */}

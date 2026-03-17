@@ -52,7 +52,7 @@ export default function SectionHeader({
             </TitleTag>
           </div>
           {body && (
-            <div className="pSection_header_additional" data-scroll data-scroll-speed="-0.3">
+            <div className="pSection_header_additional" data-scroll>
               <div className="st3" data-split>{body}</div>
             </div>
           )}

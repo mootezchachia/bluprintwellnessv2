@@ -19,8 +19,8 @@ export default function ExperimentationSection() {
                 data-split
                 data-scroll
                 data-scroll-call="sphereTitle"
-                data-scroll-offset="15%"
-                data-scroll-speed="-0.4"
+                data-scroll-offset="5%"
+                data-scroll-speed="-0.25"
               >
                 {experimentationContent.sideTitle.split("\n").map((line, i, arr) => (
                   <span key={i}>{line}{i < arr.length - 1 && <br />}</span>

@@ -36,8 +36,7 @@ function HomeContent() {
     startScroll();
     // Reveal navbar and hero elements with choreographed animation
     revealAfterLoading();
-    // Start ambient sound
-    window.dispatchEvent(new Event("ambientSound:start"));
+
   }, [startScroll]);
 
   return (

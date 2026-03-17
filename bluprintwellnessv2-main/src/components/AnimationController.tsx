@@ -67,11 +67,11 @@ export default function AnimationController() {
         animate(label, {
           opacity: [0, 1],
           translateY: [10, 0],
-          duration: 500,
+          duration: 400,
           easing: "easeOutExpo",
-          delay: 200,
+          delay: 100,
         });
-        delay = 400;
+        delay = 250;
       }
 
       // Title words reveal with 3D perspective rotation
@@ -84,9 +84,9 @@ export default function AnimationController() {
           rotateX: [45, 0],
           rotate: [8, 0],
           opacity: [0, 1],
-          duration: 1000,
+          duration: 700,
           easing: "easeOutExpo",
-          delay: stagger(50, { start: delay > 0 ? 100 : 0 }),
+          delay: stagger(35, { start: delay > 0 ? 50 : 0 }),
         });
       }
 
@@ -96,8 +96,8 @@ export default function AnimationController() {
           translateY: [40, 0],
           opacity: [0, 1],
           easing: "easeOutExpo",
-          duration: 600,
-          delay: stagger(100, { start: 600 }),
+          duration: 450,
+          delay: stagger(70, { start: 400 }),
         });
       }
 
@@ -108,9 +108,9 @@ export default function AnimationController() {
           animate(words, {
             translateY: ["100%", "0"],
             opacity: [0, 1],
-            duration: 600,
+            duration: 450,
             easing: "easeOutExpo",
-            delay: stagger(0, { start: 1000 + i * 120 }),
+            delay: stagger(0, { start: 600 + i * 80 }),
           });
         }
       });
@@ -121,13 +121,13 @@ export default function AnimationController() {
         const label = discover.querySelector(".buttonDiscover_label");
         const arrow = discover.querySelector(".buttonDiscover_arrow");
         if (border) {
-          animate(border, { scale: [0, 1], duration: 600, easing: "easeOutExpo", delay: 1200 });
+          animate(border, { scale: [0, 1], duration: 500, easing: "easeOutExpo", delay: 800 });
         }
         if (label) {
-          animate(label, { translateX: ["-105%", "0%"], duration: 600, easing: "easeOutExpo", delay: 1000 });
+          animate(label, { translateX: ["-105%", "0%"], duration: 500, easing: "easeOutExpo", delay: 650 });
         }
         if (arrow) {
-          animate(arrow, { translateY: [-40, 0], duration: 600, easing: "easeOutExpo", delay: 1050 });
+          animate(arrow, { translateY: [-40, 0], duration: 500, easing: "easeOutExpo", delay: 700 });
         }
       }
     };
@@ -139,8 +139,11 @@ export default function AnimationController() {
       const fadeTarget = target.getAttribute("data-fade-target");
       if (fadeTarget) parent = document.querySelector(fadeTarget);
       if (parent) {
-        parent.style.opacity = String(1 - progress);
-        parent.style.filter = `blur(${20 * progress}px)`;
+        // Snap at extremes to avoid lingering semi-transparent states
+        const p = progress < 0.05 ? 0 : progress > 0.95 ? 1 : progress;
+        parent.style.opacity = String(1 - p);
+        parent.style.filter = p > 0.01 ? `blur(${6 * p}px)` : "none";
+        parent.style.pointerEvents = p > 0.5 ? "none" : "";
       }
     };
 
@@ -277,9 +280,9 @@ export default function AnimationController() {
             translateY: ["100%", "0"],
             rotateX: [30, 0],
             opacity: [0, 1],
-            duration: 800,
+            duration: 1200,
             easing: "easeOutExpo",
-            delay: stagger(40, { start: i * 120 }),
+            delay: stagger(60, { start: i * 180 }),
           });
         }
       });
@@ -367,6 +370,7 @@ export default function AnimationController() {
       if (progress <= 0 || progress >= 1) {
         recognitionState.initialized = false;
         recognitionState.unlocked = false;
+        recognitionState.currentSlide = 0;
       }
 
       const newSlide = Math.min(Math.floor(progress * totalSlides), totalSlides - 1);

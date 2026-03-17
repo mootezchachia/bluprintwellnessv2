@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useLenis } from "@/hooks/useLenis";
 import { menuContent } from "@/data/content";
 import Button from "@/components/ui/Button";
-import AmbientSound from "@/components/decorative/AmbientSound";
+
 
 const pageRoutes = [
   { href: "/functional-medicine", label: "Functional Medicine" },
@@ -92,7 +92,6 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
         <div className="menu_actions">
           <Button scrollTo="contact" onClick={onClose} dataSplitLabel="char">Contact</Button>
-          <AmbientSound />
         </div>
 
         <div className="menu_footer">

@@ -48,13 +48,13 @@ export default function HeroSection() {
                 <div className="pSection_header_title">
                   <h1 className="hero_titles">
                     {heroContent.titles.map((t) => (
-                      <span key={t.step} data-step={t.step} data-split="lines,words" style={t.step === 2 ? { opacity: step >= 2 ? 1 : 0 } : undefined}>
-                        {titleLines(t.text)}
+                      <span key={t.step} data-step={t.step} data-split="lines,words" style={{ whiteSpace: "pre-line", ...(t.step === 2 ? { opacity: step >= 2 ? 1 : 0 } : undefined) }}>
+                        {t.text}
                       </span>
                     ))}
                   </h1>
                 </div>
-                <div className="pSection_header_additional" data-scroll data-scroll-speed="-0.5">
+                <div className="pSection_header_additional" data-scroll>
                   <div className="st3" data-split>{heroContent.subtitle}</div>
                 </div>
               </div>

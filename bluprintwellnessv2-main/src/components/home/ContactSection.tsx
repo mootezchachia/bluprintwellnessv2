@@ -14,7 +14,7 @@ export default function ContactSection() {
             </a>
             <span className="joinInvest_contact_link_border" />
           </div>
-          <div className="parentFade" data-scroll data-scroll-event-progress="parentFade" data-scroll-offset="0%,100%" />
+          {/* parentFade removed — contact section should stay visible */}
         </div>
       </div>
     </div>

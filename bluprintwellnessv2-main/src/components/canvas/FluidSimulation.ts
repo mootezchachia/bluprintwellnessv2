@@ -114,7 +114,7 @@ export class FluidSimulation {
   private velocityDissipation = 0.97;
   private pressureDissipation = 0.8;
   private curlStrength = 3;
-  private mouseVelocityForce = 15;
+  private mouseVelocityForce = 0;
   private dt = 0.016;
 
   constructor(renderer: Renderer) {

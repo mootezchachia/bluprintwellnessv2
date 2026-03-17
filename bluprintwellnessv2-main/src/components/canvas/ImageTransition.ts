@@ -67,11 +67,13 @@ export const STEPS: Record<string, StepImages> = {
       "/images/desktop/detail-1.webp",
       "/images/desktop/detail-2.webp",
       "/images/desktop/detail-3.webp",
+      "/images/desktop/detail-4.webp",
     ],
     mobile: [
       "/images/mobile/detail-1.webp",
       "/images/mobile/detail-2.webp",
       "/images/mobile/detail-3.webp",
+      "/images/mobile/detail-4.webp",
     ],
   },
   focusIntro: {
@@ -135,7 +137,7 @@ export class ImageTransition {
   /* ----- shader parameters ----- */
   public strength = 0.015;
   public lateral = 0.03;
-  public distort = 0.003;
+  public distort = 0;
   public intensity = 0.1;
   public color: [number, number, number] = [0.125, 0.125, 0.125]; // #202020
 
@@ -151,6 +153,9 @@ export class ImageTransition {
   private fallbackTexture: Texture;
   private _carouselLock = false; // true while a carousel controls images
   private _lastSlidePerStep: Map<string, number> = new Map(); // tracks last slide index per step
+  private _activeTransitionFrom = ""; // tracks current morph fromKey
+  private _activeTransitionTo = ""; // tracks current morph toKey
+  private _stepSnapTime = 0; // timestamp of last setStep snap — blocks onProgress briefly
 
   constructor(gl: OGLRenderingContext) {
     this.gl = gl;
@@ -275,6 +280,15 @@ export class ImageTransition {
   onProgress(progress: number, fromKey: string, toKey: string) {
     if (this._carouselLock) return;
 
+    // Block stale sectionTransition events right after a setStep snap
+    // This prevents scroll-up events from overwriting the correctly snapped texture
+    if (performance.now() - this._stepSnapTime < 150) return;
+
+    // Only process transitions involving the current step
+    if (this.currentStepKey && fromKey !== this.currentStepKey && toKey !== this.currentStepKey) return;
+
+    const pairChanged = fromKey !== this._activeTransitionFrom || toKey !== this._activeTransitionTo;
+
     // If a slide fade is in progress, complete it immediately to allow the morph
     if (this.fadeAnimationId !== null) {
       cancelAnimationFrame(this.fadeAnimationId);
@@ -288,32 +302,38 @@ export class ImageTransition {
 
     this.mode = 0;
 
-    // Use last known slide index for the "from" step
-    // (preserves accordion/carousel position, e.g. focus-4 instead of focus-1)
-    const fromSlideIdx = this._lastSlidePerStep.get(fromKey) ?? 0;
-    const fromUrl = this.getImageUrl(fromKey, fromSlideIdx);
-    const toUrl = this.getImageUrl(toKey, 0);
+    // Only reassign textures when the transition pair changes
+    if (pairChanged) {
+      this._activeTransitionFrom = fromKey;
+      this._activeTransitionTo = toKey;
 
-    if (fromUrl) {
-      const tex = this.getTextureForUrl(fromUrl);
-      if (tex !== this.fallbackTexture) {
-        this.textureA = tex;
-        this.imageResA = this.getTextureRes(tex);
+      // Use last known slide index for the "from" step
+      // (preserves accordion/carousel position, e.g. focus-4 instead of focus-1)
+      const fromSlideIdx = this._lastSlidePerStep.get(fromKey) ?? 0;
+      const fromUrl = this.getImageUrl(fromKey, fromSlideIdx);
+      const toUrl = this.getImageUrl(toKey, 0);
+
+      if (fromUrl) {
+        const tex = this.getTextureForUrl(fromUrl);
+        if (tex !== this.fallbackTexture) {
+          this.textureA = tex;
+          this.imageResA = this.getTextureRes(tex);
+        }
       }
-    }
 
-    if (toUrl) {
-      const tex = this.getTextureForUrl(toUrl);
-      if (tex !== this.fallbackTexture) {
-        this.textureB = tex;
-        this.imageResB = this.getTextureRes(tex);
-      } else {
-        // Texture not yet loaded — use textureA as stand-in for B
-        // so the morph blends A→A (no visual corruption) until B arrives
-        this.textureB = this.textureA;
-        this.imageResB = [...this.imageResA] as [number, number];
-        // Kick off the load so next progress event picks it up
-        this.loadTexture(toUrl);
+      if (toUrl) {
+        const tex = this.getTextureForUrl(toUrl);
+        if (tex !== this.fallbackTexture) {
+          this.textureB = tex;
+          this.imageResB = this.getTextureRes(tex);
+        } else {
+          // Texture not yet loaded — use textureA as stand-in for B
+          // so the morph blends A→A (no visual corruption) until B arrives
+          this.textureB = this.textureA;
+          this.imageResB = [...this.imageResA] as [number, number];
+          // Kick off the load so next progress event picks it up
+          this.loadTexture(toUrl);
+        }
       }
     }
 
@@ -420,39 +440,70 @@ export class ImageTransition {
     // Block step changes while carousel is locked (e.g. sphere activation during recognition)
     if (this._carouselLock) return;
 
+    const prevKey = this.currentStepKey;
+
     // Save current step's slide position before changing
-    if (this.currentStepKey) {
-      this._lastSlidePerStep.set(this.currentStepKey, this.currentSlideIndex);
+    if (prevKey) {
+      this._lastSlidePerStep.set(prevKey, this.currentSlideIndex);
     }
 
     this.currentStepKey = key;
-    this.currentSlideIndex = 0;
+    this.currentSlideIndex = this._lastSlidePerStep.get(key) ?? 0;
 
     // Eagerly preload the next step so textures are ready before scroll reaches it
     const idx = STEP_ORDER.indexOf(key);
     if (idx >= 0 && idx < STEP_ORDER.length - 1) {
       this.preloadStep(STEP_ORDER[idx + 1]);
     }
+    // Also preload the previous step for reverse scroll
+    if (idx > 0) {
+      this.preloadStep(STEP_ORDER[idx - 1]);
+    }
 
-    // Only load textures on cold start (no visible image yet).
-    // During scroll transitions, sectionTransition morphs handle the visual change
-    // — loading here would snap the image and break the smooth morph.
-    if (this.textureA !== this.fallbackTexture) return;
+    // Check if a sectionTransition morph is already driving the correct transition
+    // If so, DON'T snap — let the morph handle it smoothly
+    const morphIsRelevant =
+      (this._activeTransitionFrom === prevKey && this._activeTransitionTo === key) ||
+      (this._activeTransitionFrom === key && this._activeTransitionTo === prevKey) ||
+      (this._activeTransitionTo === key) ||
+      (this._activeTransitionFrom === key);
 
-    // Cold start: load first image of the new step as the "A" texture
-    const url = this.getImageUrl(key, 0);
+    if (morphIsRelevant && this.mode === 0 && this.progress > 0.01 && this.progress < 0.99) {
+      // Morph is actively transitioning to/from this step — let it continue
+      return;
+    }
+
+    // No relevant morph running — snap to correct image (fast scroll case)
+    // Cancel any in-flight fade animation
+    if (this.fadeAnimationId !== null) {
+      cancelAnimationFrame(this.fadeAnimationId);
+      this.fadeAnimationId = null;
+    }
+
+    this._activeTransitionFrom = "";
+    this._activeTransitionTo = "";
+    this.mode = 0;
+    this.progress = 0;
+    this.fadeProgress = 0;
+    this._stepSnapTime = performance.now();
+
+    const slideIdx = this._lastSlidePerStep.get(key) ?? 0;
+    const url = this.getImageUrl(key, slideIdx);
     if (url) {
       const tex = this.getTextureForUrl(url);
       if (tex !== this.fallbackTexture) {
         this.textureA = tex;
         this.imageResA = this.getTextureRes(tex);
+        this.textureB = tex;
+        this.imageResB = this.getTextureRes(tex);
         this.imageMix = 1;
       } else {
-        // Texture not yet loaded — load it async then apply
         this.loadTexture(url).then((loadedTex) => {
           if (loadedTex && this.currentStepKey === key) {
             this.textureA = loadedTex;
             this.imageResA = this.getTextureRes(loadedTex);
+            this.textureB = loadedTex;
+            this.imageResB = this.getTextureRes(loadedTex);
             this.imageMix = 1;
           }
         });

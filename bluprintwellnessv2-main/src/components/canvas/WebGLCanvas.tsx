@@ -101,7 +101,7 @@ export default function WebGLCanvas() {
         // Post-processing
         uTime: { value: 0 },
         uGrainIntensity: { value: 0.045 },
-        uChromaStrength: { value: 0.006 },
+        uChromaStrength: { value: 0 },
         uVignetteStrength: { value: 0.2 },
       },
       depthTest: false,
@@ -202,19 +202,22 @@ export default function WebGLCanvas() {
     /* ------------------------------------------------------------ */
 
     // Direct LS v5 sectionTransition progress events
-    // Guard: ignore stale transitions if we've already moved past them
+    // Guard: ignore stale transitions — direction-aware
     const handleSectionTransition = (e: Event) => {
       const { target, progress } = (e as CustomEvent).detail;
       const from = target.getAttribute("data-from");
       const to = target.getAttribute("data-to");
       if (!to || !STEPS[to] || progress <= 0 || progress >= 1) return;
 
-      // Skip if current step is already beyond this transition in the chain
-      const currentIdx = STEP_ORDER.indexOf(images.stepKey);
+      const fromKey = from || "hero";
+      const fromIdx = STEP_ORDER.indexOf(fromKey);
       const toIdx = STEP_ORDER.indexOf(to);
-      if (currentIdx > toIdx) return;
+      const currentIdx = STEP_ORDER.indexOf(images.stepKey);
 
-      images.onProgress(progress, from || "hero", to);
+      // Only allow if current step is within 1 step of this transition in either direction
+      if (Math.abs(currentIdx - fromIdx) > 1 && Math.abs(currentIdx - toIdx) > 1) return;
+
+      images.onProgress(progress, fromKey, to);
     };
 
     // Slide change events from AnimationController (recognition, manifesto, accordions)
