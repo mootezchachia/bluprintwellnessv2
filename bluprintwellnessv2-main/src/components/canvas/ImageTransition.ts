@@ -103,8 +103,8 @@ export const STEPS: Record<string, StepImages> = {
     mobile: ["/images/mobile/invest-img.webp"],
   },
   blank: {
-    desktop: ["/images/desktop/hero.webp"],
-    mobile: ["/images/mobile/hero.webp"],
+    desktop: ["/images/desktop/join-person.webp"],
+    mobile: ["/images/mobile/join-person.webp"],
   },
 };
 
@@ -156,6 +156,7 @@ export class ImageTransition {
   private _activeTransitionFrom = ""; // tracks current morph fromKey
   private _activeTransitionTo = ""; // tracks current morph toKey
   private _stepSnapTime = 0; // timestamp of last setStep snap — blocks onProgress briefly
+  private _lastProgress = 0; // tracks last morph progress for direction detection
 
   constructor(gl: OGLRenderingContext) {
     this.gl = gl;
@@ -282,10 +283,16 @@ export class ImageTransition {
 
     // Block stale sectionTransition events right after a setStep snap
     // This prevents scroll-up events from overwriting the correctly snapped texture
-    if (performance.now() - this._stepSnapTime < 150) return;
+    if (performance.now() - this._stepSnapTime < 400) return;
 
     // Only process transitions involving the current step
     if (this.currentStepKey && fromKey !== this.currentStepKey && toKey !== this.currentStepKey) return;
+
+    // Direction tracking: skip stale backward transitions from unrelated steps
+    if (progress < this._lastProgress - 0.1 && fromKey !== this.currentStepKey) {
+      this._lastProgress = progress;
+      return;
+    }
 
     const pairChanged = fromKey !== this._activeTransitionFrom || toKey !== this._activeTransitionTo;
 
@@ -339,6 +346,7 @@ export class ImageTransition {
 
     this.progress = Math.max(0, Math.min(1, progress));
     this.imageMix = 1;
+    this._lastProgress = progress;
   }
 
   /* ================================================================ */
@@ -486,6 +494,7 @@ export class ImageTransition {
     this.progress = 0;
     this.fadeProgress = 0;
     this._stepSnapTime = performance.now();
+    this._lastProgress = 0;
 
     const slideIdx = this._lastSlidePerStep.get(key) ?? 0;
     const url = this.getImageUrl(key, slideIdx);

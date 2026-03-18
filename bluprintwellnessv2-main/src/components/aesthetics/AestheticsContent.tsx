@@ -88,7 +88,7 @@ export default function AestheticsContent() {
               <div className="aesthetics_provider">
                 <div className="aesthetics_provider_image ls-cover ls-cover--btt" data-scroll data-scroll-offset="15%">
                   <img
-                    src="/images/desktop/focus-4.webp"
+                    src="/images/desktop/aesthetics-provider.webp"
                     alt={aestheticsContent.provider.name}
                     loading="lazy"
                     decoding="async"
@@ -210,37 +210,6 @@ export default function AestheticsContent() {
                     </div>
                   ))}
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="aesthetics_divider" />
-      </div>
-
-      {/* ══ TESTIMONIALS ══ */}
-      <div className="pSection pSection--aestheticsTestimonials">
-        <div className="pSection_sub">
-          <div className="pSection_sticky">
-            <div className="container">
-              <div className="aesthetics_testimonialsHeader ls-appear" data-scroll data-scroll-offset="15%">
-                <span className="st4">{aestheticsContent.testimonials.label}</span>
-                <h2 className="st2">
-                  {aestheticsContent.testimonials.title.split("\n").map((line, i) => (
-                    <span key={i} style={{ display: "block" }}>{line}</span>
-                  ))}
-                </h2>
-              </div>
-              <div className="aesthetics_testimonials">
-                {aestheticsContent.testimonials.items.map((item, i) => (
-                  <div key={i} className="aesthetics_testimonial ls-appear" data-scroll data-scroll-offset="15%">
-                    <div className="aesthetics_testimonial_avatar">
-                      <span>{item.initials}</span>
-                    </div>
-                    <blockquote className="aesthetics_testimonial_quote">
-                      &ldquo;{item.quote}&rdquo;
-                    </blockquote>
-                  </div>
-                ))}
               </div>
             </div>
           </div>

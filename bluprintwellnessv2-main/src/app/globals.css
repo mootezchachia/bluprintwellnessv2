@@ -995,6 +995,41 @@ button,
   .pSection_header_additional { max-width: 100%; }
 }
 
+/* Glassmorphism on homepage section subtitles only */
+.pSection--hero .pSection_header_additional,
+.pSection--sport .pSection_header_additional,
+.pSection--sphere .pSection_header_additional,
+.pSection--join .pSection_header_additional,
+.pSection--invest .pSection_header_additional,
+.pSection--apply .pSection_header_additional {
+  background: rgba(0, 0, 0, 0.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  backdrop-filter: blur(24px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 20px 24px;
+  margin: -20px -24px;
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  /* Hidden initially — fades in just before words appear */
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+/* Reveal glass when section header is in view */
+.pSection_header.is-inview .pSection_header_additional {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.pSection_header_subtitle {
+  margin-top: 1rem;
+}
+.pSection_header_subtitle .st2 {
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  font-weight: 300;
+  line-height: 1.4;
+  opacity: 0.85;
+}
 
 .pSection_header_footer {
   display: flex;
@@ -1273,7 +1308,12 @@ button,
   .recognition_titles { font-size: 2.57rem; }
 }
 @media (max-width: 767px) {
-  .recognition_titles { height: 9.2em; font-size: 2.29rem; }
+  .recognition_titles {
+    height: 9.2em;
+    font-size: 2.29rem;
+    -webkit-text-stroke: 1.2px rgba(0, 0, 0, 0.7);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  }
 }
 
 .recognition_titles > .st4 {
@@ -1400,46 +1440,6 @@ button,
   .recognition_nav_label { display: none; }
 }
 
-.recognition_nav_mobileTitles {
-  display: none;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 30px;
-}
-@media (max-width: 767px) {
-  .recognition_nav_mobileTitles { display: block; }
-}
-
-.recognition_nav_mobileTitles_item {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  text-transform: uppercase;
-  font-weight: 570;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.2s linear, transform 0.6s var(--ease-smooth);
-}
-.recognition_nav_mobileTitles_item.active {
-  opacity: 1;
-  transform: translateY(0);
-}
-.recognition_nav_mobileTitles_item_label {
-  display: block;
-  letter-spacing: 0.05em;
-  flex: 1;
-}
-.recognition_nav_mobileTitles_item_num {
-  display: block;
-  margin-left: 30px;
-}
-
 .recognition_brands {
   position: absolute;
   z-index: 1;
@@ -1561,6 +1561,9 @@ button,
   font-weight: 300;
   line-height: 1.15;
   opacity: 0;
+  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.6);
+  paint-order: stroke fill;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 .sphereTitle.is-inview {
   opacity: 1;
@@ -1758,9 +1761,26 @@ button,
     padding: 16px 0;
     min-height: 56px;
   }
+  .collapse {
+    height: auto;
+    overflow: visible;
+  }
+  .collapse:not(.active) {
+    height: 60px;
+    overflow: hidden;
+  }
+  .collapse.active .collapse_content {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+  }
   .collapse_content_txt {
     font-size: 0.929rem;
     line-height: 1.55;
+    max-width: 100%;
+    overflow: visible;
   }
   .collapse_content_link {
     min-height: 44px;
@@ -2972,16 +2992,16 @@ html.custom-cursor * {
   letter-spacing: -0.02em;
 }
 .funcMed_doctorTitle {
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 400;
-  opacity: 0.5;
+  opacity: 0.7;
   margin-top: 8px;
   letter-spacing: 0.02em;
 }
 
 /* ── Manifesto word reveal for doctor bio ── */
 .funcMed_doctorManifesto {
-  font-size: clamp(1.143rem, 1.5vw, 1.429rem);
+  font-size: clamp(1.25rem, 1.8vw, 1.6rem);
   line-height: 1.7;
   font-weight: 350;
   margin: 32px 0 48px;
@@ -3026,7 +3046,7 @@ html.custom-cursor * {
   margin-bottom: 6px;
 }
 .funcMed_credential_body {
-  font-size: 0.857rem;
+  font-size: 1rem;
   font-weight: 380;
   line-height: 1.5;
   opacity: 0.5;
@@ -3138,14 +3158,14 @@ html.custom-cursor * {
   margin-bottom: 16px;
 }
 .funcMed_service_title {
-  font-size: 1.357rem;
+  font-size: 1.5rem;
   font-weight: 380;
   margin-bottom: 12px;
 }
 .funcMed_service_body {
-  font-size: 1rem;
+  font-size: 1.15rem;
   line-height: 1.65;
-  opacity: 0.6;
+  opacity: 0.75;
 }
 
 /* ── Partnership ── */
@@ -3461,15 +3481,15 @@ html.custom-cursor * {
   margin-bottom: 8px;
 }
 .aesthetics_providerTitle {
-  font-size: 1.071rem;
-  opacity: 0.5;
+  font-size: 1.15rem;
+  opacity: 0.7;
   margin-bottom: 28px;
   font-weight: 300;
 }
 .aesthetics_providerBio {
-  font-size: 1.071rem;
+  font-size: 1.2rem;
   line-height: 1.7;
-  opacity: 0.6;
+  opacity: 0.75;
   margin-bottom: 36px;
   font-weight: 300;
 }
@@ -3491,14 +3511,14 @@ html.custom-cursor * {
 }
 .aesthetics_credential_title {
   display: block;
-  font-size: 0.929rem;
+  font-size: 1.05rem;
   font-weight: 400;
   margin-bottom: 4px;
 }
 .aesthetics_credential_body {
   display: block;
-  font-size: 0.857rem;
-  opacity: 0.45;
+  font-size: 1rem;
+  opacity: 0.6;
   font-weight: 300;
   line-height: 1.5;
 }
@@ -4428,3 +4448,4 @@ html.custom-cursor * {
     }
   }
 }
+

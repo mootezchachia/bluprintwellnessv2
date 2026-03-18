@@ -3,7 +3,7 @@
 import { useRef, useEffect } from "react";
 import { Renderer, Program, Mesh, Triangle, Texture } from "ogl";
 import { FluidSimulation } from "./FluidSimulation";
-import { ImageTransition, STEPS, STEP_ORDER } from "./ImageTransition";
+import { ImageTransition, STEPS } from "./ImageTransition";
 import { baseVert, outputFrag } from "./shaders";
 
 export default function WebGLCanvas() {
@@ -210,12 +210,9 @@ export default function WebGLCanvas() {
       if (!to || !STEPS[to] || progress <= 0 || progress >= 1) return;
 
       const fromKey = from || "hero";
-      const fromIdx = STEP_ORDER.indexOf(fromKey);
-      const toIdx = STEP_ORDER.indexOf(to);
-      const currentIdx = STEP_ORDER.indexOf(images.stepKey);
 
-      // Only allow if current step is within 1 step of this transition in either direction
-      if (Math.abs(currentIdx - fromIdx) > 1 && Math.abs(currentIdx - toIdx) > 1) return;
+      // Only allow if current step is exactly the from or to of this transition
+      if (images.stepKey !== fromKey && images.stepKey !== to) return;
 
       images.onProgress(progress, fromKey, to);
     };

@@ -15,6 +15,7 @@ export default function SphereLabSection() {
         label={sphereLabContent.label}
         title={sphereLabContent.title}
         titleTag="h2"
+        subtitle={sphereLabContent.subtitle}
         body={sphereLabContent.body}
         discoverLabel={sphereLabContent.discoverLabel}
         discoverTarget="experimentation"

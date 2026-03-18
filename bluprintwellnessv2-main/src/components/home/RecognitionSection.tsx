@@ -71,27 +71,6 @@ export default function RecognitionSection() {
               </div>
             ))}
 
-            {/* Mobile titles */}
-            <div
-              className="recognition_nav_mobileTitles ls-appear"
-              data-scroll
-              data-scroll-offset="0%"
-            >
-              {slides.map((slide, i) => (
-                <div
-                  key={i}
-                  className={`recognition_nav_mobileTitles_item${i === 0 ? " active" : ""}`}
-                  data-index={i}
-                >
-                  <span className="recognition_nav_mobileTitles_item_label">
-                    {slide.navLabel}
-                  </span>
-                  <span className="recognition_nav_mobileTitles_item_num">
-                    {slide.navNum}
-                  </span>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
 

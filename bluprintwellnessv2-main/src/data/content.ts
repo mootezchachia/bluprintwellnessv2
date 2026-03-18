@@ -56,7 +56,8 @@ export const recognitionContent = {
 export const sphereLabContent = {
   label: "The Studio",
   title: "Bluprint\nWellness",
-  body: "Your Everyday Wellness Retreat. Located in Solana Beach, Bluprint Wellness features industry-leading technologies that deliver powerful, proven results with precision, safety, and minimal downtime. An elevated, technology-forward experience where advanced science, artistry, and wellness converge. This is a destination for confidence, rejuvenation, and feeling your absolute best.",
+  subtitle: "Your Everyday Wellness Retreat",
+  body: "Located in Solana Beach, Bluprint Wellness features industry-leading technologies that deliver powerful, proven results with precision, safety, and minimal downtime. An elevated, technology-forward experience where advanced science, artistry, and wellness converge. This is a destination for confidence, rejuvenation, and feeling your absolute best.",
   discoverLabel: "Learn more",
 };
 

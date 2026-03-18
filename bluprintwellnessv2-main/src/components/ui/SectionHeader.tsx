@@ -6,6 +6,7 @@ interface SectionHeaderProps {
   label?: string;
   title: string;
   titleTag?: "h1" | "h2";
+  subtitle?: string;
   body?: string;
   actions?: React.ReactNode;
   discoverLabel?: string;
@@ -29,7 +30,7 @@ function TextWithBreaks({ text, className, dataSplit }: { text: string; classNam
 }
 
 export default function SectionHeader({
-  label, title, titleTag = "h1", body, actions, discoverLabel, discoverTarget, className = "", triggerCirclesState
+  label, title, titleTag = "h1", subtitle, body, actions, discoverLabel, discoverTarget, className = "", triggerCirclesState
 }: SectionHeaderProps) {
   const TitleTag = titleTag;
   const titleParts = title.split("\n");
@@ -51,6 +52,11 @@ export default function SectionHeader({
               ))}
             </TitleTag>
           </div>
+          {subtitle && (
+            <div className="pSection_header_subtitle" data-scroll>
+              <div className="st2" data-split>{subtitle}</div>
+            </div>
+          )}
           {body && (
             <div className="pSection_header_additional" data-scroll>
               <div className="st3" data-split>{body}</div>
