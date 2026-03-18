@@ -1291,7 +1291,7 @@ button,
   padding-bottom: 60px;
 }
 @media (max-width: 767px) {
-  .recognition_carousel { padding-bottom: 120px; width: calc(100vw - 60px); max-width: calc(100vw - 60px); }
+  .recognition_carousel { padding-bottom: 200px; width: calc(100vw - 60px); max-width: calc(100vw - 60px); }
 }
 
 .recognition_titles {
